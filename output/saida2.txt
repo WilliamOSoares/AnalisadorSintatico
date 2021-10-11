@@ -1,0 +1,9 @@
+01 fora de escopo Variaveis
+01 fora de escopo {
+02 fora de escopo inteiro a_2;
+03 fora de escopo inteiro a_2;
+04 fora de escopo real c;
+05 fora de escopo }
+08 CoMF funcao vazio soma (inteiro e,)
+20 soma(a,)
+22 CMF se(c > )
