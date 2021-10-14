@@ -15,7 +15,6 @@ erros = []
 siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF"]
 dados = []
 tuplas = []
-indice = 0
 
 # Abertura do arquivo
 def input():
@@ -641,7 +640,6 @@ def estadoQ38(caractere,entrada, linha):
 ########################################### Analise Sintatica ###############################################
 
 def CONTEUDO(dados, x):
-    global indice
     print (dados[x][2])
     if(dados[x][2] == "escreva"):
         i = ESCREVA(dados, x+1)
@@ -653,7 +651,6 @@ def CONTEUDO(dados, x):
         print("Deu errado " + "1")
 
 def ESCREVA(dados, x):
-    global indice
     print (dados[x][2])
     if(dados[x][2] == '('):
         print(x)
@@ -676,7 +673,6 @@ def ESCREVA(dados, x):
         return back
 
 def ESCONT(dados, x):
-    global indice
     print (dados[x][2])
     if(dados[x][1] == "CAR" or dados[x][1] == "CAR" or dados[x][1] == "IDE"):
         i = ESFIM(dados,x+1)
@@ -686,7 +682,6 @@ def ESCONT(dados, x):
         return back
 
 def ESFIM(dados, x):
-    global indice
     print (dados[x][2])
     if(dados[x][2] == ")"):
         back = [0, x+1]
