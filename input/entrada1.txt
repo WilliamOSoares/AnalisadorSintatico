@@ -1,1 +1,2 @@
-escreva(a,d,);
+escreva(a,d);
+leia(c);

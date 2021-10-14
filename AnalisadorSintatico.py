@@ -647,6 +647,17 @@ def CONTEUDO(dados, x):
            print ("Deu Certo " + str(i[0]))
         else:
             print("Deu errado " + "1")
+        x = i[1]
+    #usar if ao inveis de elif para tratar erros,caso volte a recursão e ocorra erro, 
+    # deve sempre testar todas as condições
+    print (dados[x][2])
+    if(dados[x][2] == "leia"): 
+        i = LEIA(dados, x+1)
+        if(i[0] == 0):
+           print ("Deu Certo " + str(i[0]))
+        else:
+            print("Deu errado " + "1")
+        #x = i[1]
     else:
         print("Deu errado " + "1")
 
@@ -674,7 +685,7 @@ def ESCREVA(dados, x):
 
 def ESCONT(dados, x):
     print (dados[x][2])
-    if(dados[x][1] == "CAR" or dados[x][1] == "CAR" or dados[x][1] == "IDE"):
+    if(dados[x][1] == "CAR" or dados[x][1] == "CAD" or dados[x][1] == "IDE"):
         i = ESFIM(dados,x+1)
         return i
     else:
@@ -693,6 +704,49 @@ def ESFIM(dados, x):
         back = [1, x+1]
         return back    
 
+def LEIA(dados, x):
+    print (dados[x][2])
+    if(dados[x][2] == '('):
+        print(x)
+        i = LEIACONT(dados,x+1)
+        print(str(i[0]))
+        print(str(i[1]))
+        x=i[1]
+        print(x)
+        if(i[0] == 0):
+            if(dados[x][2] == ';'):
+                back = [0, x+1]
+                return back
+            else:
+                back = [1, x+1]
+                return back
+        else:
+            return i
+    else:
+        back = [1, x+1]
+        return back
+
+def LEIACONT(dados,x):
+    print (dados[x][2])
+    if(dados[x][1] == "IDE"):
+        i = LEIAFIM(dados,x+1)
+        return i
+    else:
+        back = [1, x+1]
+        return back
+
+def LEIAFIM(dados, x):
+    print (dados[x][2])
+    if(dados[x][2] == ")"):
+        back = [0, x+1]
+        return back
+    elif(dados[x][2] == ","):
+        i = LEIACONT(dados, x+1)
+        return i
+    else:
+        back = [1, x+1]
+        return back
+  
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input
 flag = True
