@@ -13,6 +13,9 @@ endRead = False #Acaba a leitura de arquivos
 pre = ["algoritmo","variaveis","constantes","registro","funcao","retorno","vazio","se","senao","enquanto","para","leia","escreva","inteiro","real","booleano","char","cadeia","verdadeiro","falso"]
 erros = []
 siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF"]
+dados = []
+tuplas = []
+indice = 0
 
 # Abertura do arquivo
 def input():
@@ -27,7 +30,7 @@ def input():
 
 # Escreve uma nova linha no arquivo de saída
 def output(linha, code, buffer):
-    global countArq, erros, siglaErro
+    global countArq, erros, siglaErro, dados, tuplas
     f = open("output/saida%d.txt" %countArq,"a")
     if(code == "ERRO"): 
         f.write("\n")
@@ -35,13 +38,19 @@ def output(linha, code, buffer):
             for x in erros:
                 f.write(x)
                 f.write("\n")
-        else:
-            f.write("SUCESSO!")
+        #else:
+        #    f.write("SUCESSO!")
     else:
         if(linha<10):
             linhaSaida = "0" + str(linha) + " " + code +" " + buffer
+            tuplas.append("0" + str(linha))
+            tuplas.append(code)
+            tuplas.append(buffer)
         else:
             linhaSaida = str(linha) + " " + code +" " + buffer
+            tuplas.append(str(linha))
+            tuplas.append(code)
+            tuplas.append(buffer)
         flagER = False
         for x in siglaErro:
             if(x==code):
@@ -49,8 +58,10 @@ def output(linha, code, buffer):
         if(flagER):
             erros.append(linhaSaida)
         else:
-            f.write(linhaSaida)
-            f.write("\n")
+            #f.write(linhaSaida)
+            #f.write("\n")
+            dados.append(tuplas)
+            tuplas = []
     f.close()
 
 # Verifica se é uma palavra reservada ou identificador
@@ -625,6 +636,68 @@ def estadoQ38(caractere,entrada, linha):
         estado = "Q0"
         buffer=""
 
+#############################################################################################################
+
+########################################### Analise Sintatica ###############################################
+
+def CONTEUDO(dados, x):
+    global indice
+    print (dados[x][2])
+    if(dados[x][2] == "escreva"):
+        i = ESCREVA(dados, x+1)
+        if(i[0] == 0):
+           print ("Deu Certo " + str(i[0]))
+        else:
+            print("Deu errado " + "1")
+    else:
+        print("Deu errado " + "1")
+
+def ESCREVA(dados, x):
+    global indice
+    print (dados[x][2])
+    if(dados[x][2] == '('):
+        print(x)
+        i = ESCONT(dados,x+1)
+        print(str(i[0]))
+        print(str(i[1]))
+        x=i[1]
+        print(x)
+        if(i[0] == 0):
+            if(dados[x][2] == ';'):
+                back = [0, x+1]
+                return back
+            else:
+                back = [1, x+1]
+                return back
+        else:
+            return i
+    else:
+        back = [1, x+1]
+        return back
+
+def ESCONT(dados, x):
+    global indice
+    print (dados[x][2])
+    if(dados[x][1] == "CAR" or dados[x][1] == "CAR" or dados[x][1] == "IDE"):
+        i = ESFIM(dados,x+1)
+        return i
+    else:
+        back = [1, x+1]
+        return back
+
+def ESFIM(dados, x):
+    global indice
+    print (dados[x][2])
+    if(dados[x][2] == ")"):
+        back = [0, x+1]
+        return back
+    elif(dados[x][2] == ","):
+        i = ESCONT(dados, x+1)
+        return i
+    else:
+        back = [1, x+1]
+        return back    
+
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input
 flag = True
@@ -643,6 +716,7 @@ else:
     while(not(endRead)):
         entrada = input()
         if(not(entrada=="")):
+            flagSintax = True
             while 1:
                 linha = entrada.readline()	
                 i = 0
@@ -666,3 +740,8 @@ else:
         countLinha=1
         buffer=""
         erros.clear()
+        if(flagSintax):
+            CONTEUDO(dados, 0)
+            dados = []
+            flagSintax = False
+        

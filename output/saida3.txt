@@ -1,5 +1,1 @@
-01 CoMF leia("Coloque um inteiro:");
-04 CMF  senao se(<100)
-05 CoMF escreva("Isso eh uma dezena")
-06 CMF senao se(a<=)
-07 CoMF escreva("Isso eh uma centena")
+
