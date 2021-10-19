@@ -1,2 +1,5 @@
-escreva(a,d);
-leia(c);
+algoritmo{
+escreva(a);
+leia(a);
+funcao inteiro a(){
+}

@@ -12,7 +12,7 @@ skip = False #Usado para pular linha
 endRead = False #Acaba a leitura de arquivos
 pre = ["algoritmo","variaveis","constantes","registro","funcao","retorno","vazio","se","senao","enquanto","para","leia","escreva","inteiro","real","booleano","char","cadeia","verdadeiro","falso"]
 erros = []
-siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF"]
+siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","CmdMF"]
 dados = []
 tuplas = []
 
@@ -32,13 +32,13 @@ def output(linha, code, buffer):
     global countArq, erros, siglaErro, dados, tuplas
     f = open("output/saida%d.txt" %countArq,"a")
     if(code == "ERRO"): 
-        f.write("\n")
+        #f.write("\n")
         if erros:
             for x in erros:
                 f.write(x)
                 f.write("\n")
-        #else:
-        #    f.write("SUCESSO!")
+        else:
+            f.write("SUCESSO!")
     else:
         if(linha<10):
             linhaSaida = "0" + str(linha) + " " + code +" " + buffer
@@ -56,6 +56,7 @@ def output(linha, code, buffer):
                 flagER = True
         if(flagER):
             erros.append(linhaSaida)
+            tuplas = []
         else:
             #f.write(linhaSaida)
             #f.write("\n")
@@ -639,27 +640,68 @@ def estadoQ38(caractere,entrada, linha):
 
 ########################################### Analise Sintatica ###############################################
 
-def CONTEUDO(dados, x):
-    print (dados[x][2])
-    if(dados[x][2] == "escreva"):
-        i = ESCREVA(dados, x+1)
-        if(i[0] == 0):
-           print ("Deu Certo " + str(i[0]))
-        else:
-            print("Deu errado " + "1")
-        x = i[1]
-    #usar if ao inveis de elif para tratar erros,caso volte a recursão e ocorra erro, 
-    # deve sempre testar todas as condições
-    print (dados[x][2])
-    if(dados[x][2] == "leia"): 
-        i = LEIA(dados, x+1)
-        if(i[0] == 0):
-           print ("Deu Certo " + str(i[0]))
-        else:
-            print("Deu errado " + "1")
-        #x = i[1]
+def START(dados, x):
+    if(dados[x][2] == "algoritmo"):
+        i = ALGORITMO(dados, x+1)
     else:
-        print("Deu errado " + "1")
+        output(int(dados[x][0]), "CmdMF", dados[x][2])
+
+
+def ALGORITMO(dados, x):
+    if(dados[x][2]=="{"):
+        i = CONTEUDO(dados, x+1)
+        if(i[0] == 0):
+            back = [0, x+1]
+            return back
+        else:
+            back = [1, x+1]
+            return back
+        
+
+def CONTEUDO(dados, x):
+    errado = False
+    buffer = ""
+    linhaErro = x
+    back = [0, x+1]
+    while(x<len(dados)):
+        if(dados[x][2] == "}"):
+            if(errado):
+                output(linhaErro, "CmdMF", buffer)
+                back = [1, x+1]
+                return back
+            else:
+                back = [0, x+1]
+                return back
+        elif(dados[x][2] == "escreva"):
+            if(errado):
+                output(linhaErro, "CmdMF", buffer)
+                linhaErro = x
+                buffer = ""
+                errado = False
+            i = ESCREVA(dados, x+1)
+            x = i[1]
+        #usar if ao inveis de elif para tratar erros,caso volte a recursão e ocorra erro, 
+        # deve sempre testar todas as condições
+        elif(dados[x][2] == "leia"): 
+            if(errado):
+                output(linhaErro, "CmdMF", buffer)
+                linhaErro = x
+                buffer = ""
+                errado = False
+            i = LEIA(dados, x+1)
+            x = i[1]
+            #if(i[0] == 0):
+            #    print ("Deu Certo " + str(i[0]))
+            #else:
+            #    print("Deu errado " + "1")
+            #x = i[1]
+        else:
+            errado = True
+            buffer = buffer + dados[x][2]
+            x=x+1            
+            print("Deu errado " + "1")
+    print("Virou a nilce? Cadê a chave marreco?")
+    return back
 
 def ESCREVA(dados, x):
     print (dados[x][2])
@@ -684,8 +726,17 @@ def ESCREVA(dados, x):
         return back
 
 def ESCONT(dados, x):
-    print (dados[x][2])
-    if(dados[x][1] == "CAR" or dados[x][1] == "CAD" or dados[x][1] == "IDE"):
+    #print (dados[x][2])
+    if(dados[x][1] == "IDE"):
+        i = ACESSOVAR(dados,x+1)
+        #print(dados[i[1]])
+        if(i[0] == 0):
+             i = ESFIM(dados,i[1])
+             return i
+        else:
+            back = [1, x+1]
+            return back
+    if(dados[x][1] == "CAR" or dados[x][1] == "CAD"):
         i = ESFIM(dados,x+1)
         return i
     else:
@@ -707,12 +758,8 @@ def ESFIM(dados, x):
 def LEIA(dados, x):
     print (dados[x][2])
     if(dados[x][2] == '('):
-        print(x)
         i = LEIACONT(dados,x+1)
-        print(str(i[0]))
-        print(str(i[1]))
         x=i[1]
-        print(x)
         if(i[0] == 0):
             if(dados[x][2] == ';'):
                 back = [0, x+1]
@@ -746,7 +793,20 @@ def LEIAFIM(dados, x):
     else:
         back = [1, x+1]
         return back
-  
+
+def ACESSOVAR(dados, x):
+    print("entrou")
+    if(dados[x][2] == '.'):
+        #i = ACESSOVARCONT(dados,x+1)
+        print("eh um ponto")
+        back = [0, x+1]
+        return back
+    back = [0, x]
+    return back
+
+def ACESSOVARCONT(dados, x):
+    back = [0, x+1]
+    return back
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input
 flag = True
@@ -783,14 +843,14 @@ else:
                         skip = False
                         break
                 countLinha+=1
-            output(0,"ERRO","")
             entrada.close()
-        countArq+=1
         countLinha=1
         buffer=""
-        erros.clear()
         if(flagSintax):
-            CONTEUDO(dados, 0)
-            dados = []
+            START(dados, 0)
             flagSintax = False
-        
+            output(0,"ERRO","")
+            erros.clear()
+        countArq+=1
+        erros.clear()
+        dados.clear()
