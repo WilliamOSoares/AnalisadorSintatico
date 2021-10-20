@@ -105,7 +105,7 @@ def maqEstados(caractere,entrada, linha):
     elif(estado == "Q11"):
         estadoQ11(caractere, entrada, linha)
     elif(estado == "Q12"):
-        estadoQ12(linha)
+        estadoQ12(caractere, entrada, linha)
     elif(estado == "Q13"):
         estadoQ13(caractere, entrada, linha)
     elif(estado == "Q14"):
@@ -131,7 +131,7 @@ def maqEstados(caractere,entrada, linha):
     elif(estado == "Q24"):
         estadoQ24() 
     elif(estado == "Q25"):
-        estadoQ25(linha) 
+        estadoQ25(caractere, entrada, linha) 
     elif(estado == "Q26"):
         estadoQ26(linha) 
     elif(estado == "Q27"):
@@ -158,6 +158,8 @@ def maqEstados(caractere,entrada, linha):
         estadoQ37(linha)   
     elif(estado == "Q38"):
         estadoQ38(caractere, entrada, linha) 
+    elif(estado == "Q39"):
+        estadoQ39(caractere, entrada, linha) 
     else:
         print("Bugou o estado")
 
@@ -212,7 +214,7 @@ def estadoQ1(caractere,entrada, linha):
     if(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere >=48 and caractere <= 57 or caractere ==95):
         buffer=buffer+entrada
         estado = "Q1"
-    elif(caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126):
+    elif(caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126 or caractere == 33 or caractere == 34 or caractere == 39):
         buffer=buffer+entrada
         estado = "Q38"
     else:
@@ -237,7 +239,7 @@ def estadoQ3(caractere, entrada, linha):
     elif(caractere == 46):
         buffer = buffer + entrada
         estado = "Q4"
-    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122):
+    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere ==95 or caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126):
         buffer = buffer + entrada
         estado = "Q6"
     else:
@@ -250,7 +252,7 @@ def estadoQ4(caractere, entrada, linha):
     if(caractere >= 48 and caractere <= 57):
         buffer = buffer + entrada
         estado = "Q5"
-    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere == 46):
+    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere ==95 or caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126 or caractere == 46):
         buffer = buffer + entrada
         estado = "Q6"
     else:
@@ -264,7 +266,7 @@ def estadoQ5(caractere, entrada, linha):
     if(caractere >= 48 and caractere <= 57):
         buffer = buffer + entrada
         estado = "Q5"
-    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere == 46):
+    elif(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere ==95 or caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126 or caractere == 46):
         buffer = buffer + entrada
         estado = "Q6"
     else:
@@ -325,20 +327,27 @@ def estadoQ10(linha):
 # operador relacional do tipo ==
 def estadoQ11(caractere, entrada, linha):
     global buffer, estado
-    if(caractere >=60 and caractere <= 62):
+    if(caractere == 61):
         buffer=buffer+entrada
         estado = "Q12"
+    elif (caractere == 60 or caractere == 62):
+        buffer=buffer+entrada
+        estado = "Q39"
     else:
         estado = "Q0"
         output(linha,"REL",buffer)
         buffer=""
 
 # Estado que classifica em operador relacional (==)
-def estadoQ12(linha):
+def estadoQ12(caractere, entrada, linha):
     global buffer, estado
-    estado = "Q0"
-    output(linha,"REL",buffer)
-    buffer=""
+    if (caractere >= 60 and caractere <= 62):
+        buffer=buffer+entrada
+        estado = "Q39"
+    else:
+        estado = "Q0"
+        output(linha,"REL",buffer)
+        buffer=""
 
 # Estado que analisa se é um operador logico(!) ou um possivel operador relacional(!=)
 def estadoQ13(caractere, entrada, linha):
@@ -466,11 +475,15 @@ def estadoQ24():
     buffer=""
 
 # Estado que classifica o caracter em simbolo ($ ou ` ou ~ ou ^ ou : ou ? ou @ ou _ ou \ ou #)
-def estadoQ25(linha):
+def estadoQ25(caractere, entrada, linha):
     global buffer, estado
-    estado = "Q0"
-    output(linha,"SIB",buffer)
-    buffer=""
+    if(caractere >=65 and caractere <= 90 or caractere >=97 and caractere <= 122 or caractere >=48 and caractere <= 57 or caractere ==95 or caractere == 35 or caractere == 36 or caractere == 58 or caractere == 63 or caractere == 64 or caractere == 92 or caractere == 94 or caractere == 96 or caractere == 126 or caractere == 33 or caractere == 34 or caractere == 39):
+        buffer=buffer+entrada
+        estado = "Q38"
+    else:
+        estado = "Q0"
+        output(linha,"SIB",buffer)
+        buffer=""
 
 # Estado que classifica em simbolos invalidos todos os caracteres que não pertencem ao intervalo
 # de 32 a 126 da tabela ascii e que não seja final de linha, fim de arquivo, espaço, quebra de texto
@@ -632,9 +645,19 @@ def estadoQ38(caractere,entrada, linha):
         buffer=buffer+entrada
         estado = "Q38"
     else:
-        output(linha,"SII",buffer)
+        output(linha,"SIB",buffer)
         estado = "Q0"
         buffer=""
+# Estado responsavel por classificar em identificador o caractere
+def estadoQ39(caractere,entrada, linha):
+    global buffer, estado
+    if(caractere >=60 and caractere <= 62):
+        buffer=buffer+entrada
+        estado = "Q39"
+    else:
+        output(linha,"OpMF",buffer)
+        estado = "Q0"
+        buffer=""        
 
 #############################################################################################################
 
