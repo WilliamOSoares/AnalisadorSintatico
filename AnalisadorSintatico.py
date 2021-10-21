@@ -15,6 +15,7 @@ erros = []
 siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","CmdMF"]
 dados = []
 tuplas = []
+iterador = 0
 
 # Abertura do arquivo
 def input():
@@ -661,175 +662,239 @@ def estadoQ39(caractere,entrada, linha):
 
 #############################################################################################################
 
+def proxToken():
+    global dados, tuplas, iterador
+    if(iterador<len(dados)):
+        tuplas = [dados[iterador][0], dados[iterador][1],dados[iterador][2]]
+        iterador = iterador + 1
+    else:
+        tuplas = [0, "END", "$"]
+
+def mantemToken():
+    global dados, tuplas, iterador
+    tuplas = [dados[iterador-1][0], dados[iterador-1][1],dados[iterador-1][2]]
+
 ########################################### Analise Sintatica ###############################################
 
-def START(dados, x):
-    if(dados[x][2] == "algoritmo"):
-        i = ALGORITMO(dados, x+1)
+def START():
+    global tuplas
+    if(tuplas[2] == "algoritmo"):
+        proxToken()
+        i = ALGORITMO()
     else:
-        output(int(dados[x][0]), "CmdMF", dados[x][2])
+        output(int(tuplas[0]), "CmdMF", tuplas[2])
+        mantemToken()
 
 
-def ALGORITMO(dados, x):
-    if(dados[x][2]=="{"):
-        i = CONTEUDO(dados, x+1)
-        if(i[0] == 0):
-            back = [0, x+1]
-            return back
-        else:
-            back = [1, x+1]
-            return back
+def ALGORITMO():
+    global tuplas
+    if(tuplas[2]=="{"):
+        proxToken()
+        i = CONTEUDO()
+        return i
         
 
-def CONTEUDO(dados, x):
+def CONTEUDO():
+    global tuplas,iterador,dados    ### COLOCAR O BUFFER GLOBAL PARA PERGAR DO INICIO DO ERRO ATÉ O FINAL "LEIA"
     errado = False
     buffer = ""
-    linhaErro = x
-    back = [0, x+1]
-    while(x<len(dados)):
-        if(dados[x][2] == "}"):
+    linhaErro = int(tuplas[0])
+    retorno = 0
+    while(iterador-1<len(dados)):
+        if(tuplas[2] == "}"):
+            proxToken()
             if(errado):
                 output(linhaErro, "CmdMF", buffer)
-                back = [1, x+1]
-                return back
+                mantemToken()
+                return 1
             else:
-                back = [0, x+1]
-                return back
-        elif(dados[x][2] == "escreva"):
+                return 0
+        elif(tuplas[2] == "escreva"):
+            proxToken()
             if(errado):
                 output(linhaErro, "CmdMF", buffer)
-                linhaErro = x
+                mantemToken()
+                linhaErro = int(tuplas[0])
                 buffer = ""
                 errado = False
-            i = ESCREVA(dados, x+1)
-            x = i[1]
+            i = ESCREVA()
+            if(i == 1):
+                output(linhaErro, "CmdMF", buffer)
+                mantemToken()
+                linhaErro = int(tuplas[0])
         #usar if ao inveis de elif para tratar erros,caso volte a recursão e ocorra erro, 
         # deve sempre testar todas as condições
-        elif(dados[x][2] == "leia"): 
+        elif(tuplas[2] == "leia"): 
+            proxToken()
             if(errado):
                 output(linhaErro, "CmdMF", buffer)
-                linhaErro = x
+                mantemToken()
+                linhaErro = int(tuplas[0])
                 buffer = ""
                 errado = False
-            i = LEIA(dados, x+1)
-            x = i[1]
-            #if(i[0] == 0):
-            #    print ("Deu Certo " + str(i[0]))
-            #else:
-            #    print("Deu errado " + "1")
-            #x = i[1]
+            i = LEIA()
+            if(i == 1):
+                output(linhaErro, "CmdMF", buffer)
+                mantemToken()
+                linhaErro = int(tuplas[0])
         else:
             errado = True
-            buffer = buffer + dados[x][2]
-            x=x+1            
-            print("Deu errado " + "1")
+            buffer = buffer + " " + tuplas[2]
+            proxToken()            
     print("Virou a nilce? Cadê a chave marreco?")
-    return back
+    return retorno
 
-def ESCREVA(dados, x):
-    print (dados[x][2])
-    if(dados[x][2] == '('):
-        print(x)
-        i = ESCONT(dados,x+1)
-        print(str(i[0]))
-        print(str(i[1]))
-        x=i[1]
-        print(x)
-        if(i[0] == 0):
-            if(dados[x][2] == ';'):
-                back = [0, x+1]
-                return back
+def ESCREVA():
+    global tuplas
+    if(tuplas[2] == '('):
+        proxToken()
+        i = ESCONT()
+        if(i == 0):
+            if(tuplas[2] == ';'):
+                proxToken()
+                return 0
             else:
-                back = [1, x+1]
-                return back
+                return 1
         else:
             return i
     else:
-        back = [1, x+1]
-        return back
+        return 1
 
-def ESCONT(dados, x):
-    #print (dados[x][2])
-    if(dados[x][1] == "IDE"):
-        i = ACESSOVAR(dados,x+1)
-        #print(dados[i[1]])
-        if(i[0] == 0):
-             i = ESFIM(dados,i[1])
+def ESCONT():
+    global tuplas
+    if(tuplas[1] == "IDE"):
+        proxToken()
+        i = ACESSOVAR()
+        if(i == 0):
+             i = ESFIM()
              return i
         else:
-            back = [1, x+1]
-            return back
-    if(dados[x][1] == "CAR" or dados[x][1] == "CAD"):
-        i = ESFIM(dados,x+1)
+            return i
+    if(tuplas[1] == "CAR" or tuplas[1] == "CAD"):
+        proxToken()
+        i = ESFIM()
         return i
     else:
-        back = [1, x+1]
-        return back
+        return 1
 
-def ESFIM(dados, x):
-    print (dados[x][2])
-    if(dados[x][2] == ")"):
-        back = [0, x+1]
-        return back
-    elif(dados[x][2] == ","):
-        i = ESCONT(dados, x+1)
+def ESFIM():
+    global tuplas
+    if(tuplas[2] == ")"):
+        proxToken()
+        return 0
+    elif(tuplas[2] == ","):
+        proxToken()
+        i = ESCONT()
         return i
     else:
-        back = [1, x+1]
-        return back    
+        return 1    
 
-def LEIA(dados, x):
-    print (dados[x][2])
-    if(dados[x][2] == '('):
-        i = LEIACONT(dados,x+1)
-        x=i[1]
-        if(i[0] == 0):
-            if(dados[x][2] == ';'):
-                back = [0, x+1]
-                return back
+def LEIA():
+    global tuplas
+    if(tuplas[2] == '('):
+        proxToken()
+        i = LEIACONT()
+        if(i == 0):
+            if(tuplas[2] == ';'):
+                proxToken()
+                return 0
             else:
-                back = [1, x+1]
-                return back
+                return 1
         else:
             return i
     else:
-        back = [1, x+1]
-        return back
+        return 1
 
-def LEIACONT(dados,x):
-    print (dados[x][2])
-    if(dados[x][1] == "IDE"):
-        i = LEIAFIM(dados,x+1)
+def LEIACONT():
+    global tuplas
+    if(tuplas[1] == "IDE"):
+        proxToken()
+        i = ACESSOVAR()
+        if(i == 0):
+             i = LEIAFIM()
+             return i
+        else:
+            return i
+    else:
+        return 1
+
+def LEIAFIM():
+    global tuplas
+    if(tuplas[2] == ")"):
+        proxToken()
+        return 0
+    elif(tuplas[2] == ","):
+        proxToken()
+        i = LEIACONT()
         return i
     else:
-        back = [1, x+1]
-        return back
+        return 1
 
-def LEIAFIM(dados, x):
-    print (dados[x][2])
-    if(dados[x][2] == ")"):
-        back = [0, x+1]
-        return back
-    elif(dados[x][2] == ","):
-        i = LEIACONT(dados, x+1)
-        return i
-    else:
-        back = [1, x+1]
-        return back
+def ACESSOVAR():
+    global tuplas
+    if(tuplas[2] == '.'):
+        proxToken()
+        if(tuplas[1] == 'IDE'):
+            proxToken()
+            if(tuplas[2] == '['):
+                proxToken()
+                if(tuplas[1] == 'NRO'):
+                    proxToken()
+                    if(tuplas[2] == ']'):
+                        proxToken()
+                        i = ACESSOVARCONT()
+                        return i
+                    else:
+                        return 1
+                else:
+                    return 1
+            return 0
+        else:
+            return 1
+    elif(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                i = ACESSOVARCONT()
+                return i
+            else:
+                return 1
+        else:
+            return 1
+    return 0
 
-def ACESSOVAR(dados, x):
-    print("entrou")
-    if(dados[x][2] == '.'):
-        #i = ACESSOVARCONT(dados,x+1)
-        print("eh um ponto")
-        back = [0, x+1]
-        return back
-    back = [0, x]
-    return back
+def ACESSOVARCONT():
+    global tuplas
+    if(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                i = ACESSOVARCONTB()
+                return i
+            else:
+                return 1
+        else:
+            return 1
+    return 0
 
-def ACESSOVARCONT(dados, x):
-    back = [0, x+1]
-    return back
+def ACESSOVARCONTB():
+    global tuplas
+    if(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                return 0
+            else:
+                return 1
+        else:
+            return 1
+    return 0
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input
 flag = True
@@ -870,10 +935,12 @@ else:
         countLinha=1
         buffer=""
         if(flagSintax):
-            START(dados, 0)
+            proxToken()
+            START()
             flagSintax = False
             output(0,"ERRO","")
             erros.clear()
         countArq+=1
         erros.clear()
         dados.clear()
+        tuplas.clear()

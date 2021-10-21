@@ -1,5 +1,6 @@
 algoritmo{
-escreva(a);
-leia(a);
-funcao inteiro a(){
+    escreva(a);
+    leia(a.a[2]);
+
 }
+
