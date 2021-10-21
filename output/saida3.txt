@@ -1,1 +1,1 @@
-03 CmdMF )
+06 CmdMF {

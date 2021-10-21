@@ -68,11 +68,11 @@
 		| registro <REGISTRO><CONTEUDO> 
 		| <ACESSOVAR> = <EXPATRIBUICAO><CONTEUDO>
 		| retorno <RETORNO>;
-		| <>
+		| }
 	
 ########### COMANDOS #################
 
-	<ALGORITMO> ::= { <CONTEUDO> }
+	<ALGORITMO> ::= { <CONTEUDO> 
 
 	<FUNCAO> ::= <TIPO> <TIPOCONT> <IDE> <FUNCAOINIT>
 		| vazio <TIPOCONT> <IDE> <FUNCAOINIT>
@@ -119,7 +119,7 @@
 			| [<NRO>] <VARINITCONT>
 		<VARINITCONT>::= = { <VETOR> 
 			| [<NRO>] <VARINITCONTMATR>
-		<VARINITCONTMATR> = { <VETOR> , { <VETOR>
+		<VARINITCONTMATR>::= = { <VETOR> , { <VETOR>
 			| [<NRO>] = { <VETOR> , { <VETOR> , { <VETOR>
 		
 		<VETOR> ::= <VALOR> <VETORCONT>
@@ -142,7 +142,7 @@
 			| <NRO>
 			| <ACESSOVAR>
 
-		<CONST> ::= <TIPO> <IDE> <VARINIT> <CONSTCONT>
+		<CONST> ::= <TIPO> <CONSTALT>
 		<CONSTALT> ::= <IDE> <VARINIT> <CONSTCONT>
 	 	<CONSTCONT> ::= , <CONSTALT>
 			| ; <CONSTFIM>

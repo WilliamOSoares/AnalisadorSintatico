@@ -672,7 +672,10 @@ def proxToken():
 
 def mantemToken():
     global dados, tuplas, iterador
-    tuplas = [dados[iterador-1][0], dados[iterador-1][1],dados[iterador-1][2]]
+    if(iterador<len(dados)):
+        tuplas = [dados[iterador-1][0], dados[iterador-1][1],dados[iterador-1][2]]
+    else:
+        tuplas = [0, "END", "$"]
 
 ########################################### Analise Sintatica ###############################################
 
@@ -737,12 +740,27 @@ def CONTEUDO():
                 output(linhaErro, "CmdMF", buffer)
                 mantemToken()
                 linhaErro = int(tuplas[0])
+        elif(tuplas[2] == "constantes"):
+            proxToken()
+            if(errado):
+                output(linhaErro, "CmdMF", buffer)
+                mantemToken()
+                linhaErro = int(tuplas[0])
+                buffer = ""
+                errado = False
+            i = CONSTANTES()
+            if(i == 1):
+                output(linhaErro, "CmdMF", buffer)
+                mantemToken()
+                linhaErro = int(tuplas[0])
         else:
             errado = True
             buffer = buffer + " " + tuplas[2]
             proxToken()            
     print("Virou a nilce? Cadê a chave marreco?")
     return retorno
+
+########## Escreva ########
 
 def ESCREVA():
     global tuplas
@@ -789,6 +807,8 @@ def ESFIM():
     else:
         return 1    
 
+######## Leia #########
+
 def LEIA():
     global tuplas
     if(tuplas[2] == '('):
@@ -829,6 +849,8 @@ def LEIAFIM():
         return i
     else:
         return 1
+
+########### Acesso Var ##########
 
 def ACESSOVAR():
     global tuplas
@@ -895,6 +917,178 @@ def ACESSOVARCONTB():
         else:
             return 1
     return 0
+
+########## Constantes ##########
+
+def CONSTANTES():
+    global tuplas
+    if(tuplas[2]=="{"):
+        proxToken()
+        i = CONST()
+        return i
+    return 1
+
+def CONST():
+    global tuplas
+    if(tuplas[2]== "inteiro" or tuplas[2]=="real" or tuplas[2]=="booleano" or tuplas[2]=="cadeia" or tuplas[2]=="char" or tuplas[1]=="IDE"):
+        proxToken()
+        return CONSTALT()
+    else:    
+        return 1
+
+def CONSTCONT(): 
+    global tuplas
+    if(tuplas[2]== ","):
+        proxToken()
+        return CONSTALT()
+    elif(tuplas[2]== ";"):
+        proxToken()
+        return CONSTFIM()
+    else:
+        return 1
+
+def CONSTALT():
+    if(tuplas[1]=="IDE"):
+        proxToken()
+        i = VARINIT()
+        if(i == 0):
+            #proxToken()
+            return CONSTCONT()
+        else:
+            return i
+    else:
+        return 1 
+
+def CONSTFIM():
+    if(tuplas[2]=="}"):
+        return 0
+    else:
+        return CONST()
+
+def VARINIT():
+    global tuplas
+    if(tuplas[2] == '='):
+        proxToken()
+        return VALOR()
+    elif(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                i = VARINITCONT()
+                return i
+            else:
+                return 1
+        else:
+            return 1
+    return 0
+
+def VARINITCONT():
+    if(tuplas[2] == '='):
+        proxToken()
+        if(tuplas[2] == '{'):
+            proxToken()
+            return VETOR()
+        else:
+            return 1 
+    elif(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                i = VARINITCONTMATR()
+                return i
+            else:
+                return 1
+        else:
+            return 1
+    return 0
+
+def VARINITCONTMATR():
+    if(tuplas[2] == '='):
+        proxToken()
+        if(tuplas[2] == '{'):
+            proxToken()
+            i = VETOR()
+            if(tuplas[2] == ',' and i ==0):
+                proxToken()
+                if(tuplas[2] == '{'):
+                    proxToken()
+                    return VETOR()
+                else:
+                    return 1 
+            else:
+                return 1 
+        else:
+            return 1 
+    elif(tuplas[2] == '['):
+        proxToken()
+        if(tuplas[1] == 'NRO'):
+            proxToken()
+            if(tuplas[2] == ']'):
+                proxToken()
+                if(tuplas[2] == '='):
+                    proxToken()
+                    if(tuplas[2] == '{'):
+                        proxToken()
+                        i = VETOR()
+                        if(tuplas[2] == ',' and i ==0):
+                            proxToken()
+                            if(tuplas[2] == '{'):
+                                proxToken()
+                                i = VETOR()
+                                if(tuplas[2] == ',' and i ==0):
+                                    proxToken()
+                                    if(tuplas[2] == '{'):
+                                        proxToken()
+                                        return VETOR()
+                                    else:
+                                        return 1 
+                                else:
+                                    return 1 
+                            else:
+                                return 1 
+                        else:
+                            return 1 
+                    else:
+                        return 1 
+                else:
+                    return 1
+            else:
+                return 1
+        else:
+            return 1
+    return 0
+def VETOR():
+    i = VALOR()
+    if(i == 0):
+        return VETORCONT()
+    return 1
+def VETORCONT():
+    if(tuplas[2]=="}"):
+        proxToken()
+        return 0
+    elif(tuplas[2]==","):
+        proxToken()
+        return VETOR()
+    else:
+        return 1
+    
+def VALOR():
+    if(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[1]=="CAR" or tuplas[1]=="CAD" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso"):
+        proxToken()
+        return 0
+    elif(tuplas[2]== "-"):
+        proxToken()
+        if(tuplas[1]== "NRO"):
+            proxToken()
+            return 0
+        return 1
+    proxToken()
+    return 0
+
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input
 flag = True
