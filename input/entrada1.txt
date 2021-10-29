@@ -2,8 +2,15 @@ algoritmo{
     escreva(a);
     leia(a.a[2]);
     constantes{
-        inteiro a[2] = {2,2}; 
-        real madrid = falso;
+        inteiro a[2][2][2] = {2,2},{2},{3,2,1};
+        real madrid = "falso";
+        booleano a = "True";
+    }
+    variaveis{
+        inteiro a,b,c;
+        real sociedad = 1.1;
+        real valladolid = 11.1;
+        cadeia a = False;
     }
 }
 

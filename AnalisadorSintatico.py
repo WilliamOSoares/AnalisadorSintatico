@@ -16,6 +16,7 @@ siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","CmdMF"]
 dados = []
 tuplas = []
 iterador = 0
+linha = "01"
 
 # Abertura do arquivo
 def input():
@@ -680,7 +681,7 @@ def mantemToken():
 ########################################### Analise Sintatica ###############################################
 
 def START():
-    global tuplas
+    global tuplas, buffer
     if(tuplas[2] == "algoritmo"):
         proxToken()
         i = ALGORITMO()
@@ -690,7 +691,7 @@ def START():
 
 
 def ALGORITMO():
-    global tuplas
+    global tuplas, buffer
     if(tuplas[2]=="{"):
         proxToken()
         i = CONTEUDO()
@@ -698,77 +699,93 @@ def ALGORITMO():
         
 
 def CONTEUDO():
-    global tuplas,iterador,dados    ### COLOCAR O BUFFER GLOBAL PARA PERGAR DO INICIO DO ERRO ATÉ O FINAL "LEIA"
+    global tuplas, iterador, dados, buffer, linha   ### COLOCAR O BUFFER GLOBAL PARA PERGAR DO INICIO DO ERRO ATÉ O FINAL "LEIA"
     errado = False
-    buffer = ""
-    linhaErro = int(tuplas[0])
     retorno = 0
     while(iterador-1<len(dados)):
         if(tuplas[2] == "}"):
-            proxToken()
+            i = 0
             if(errado):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                return 1
-            else:
-                return 0
+                buffer = ""
+                i = 1
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            return i
         elif(tuplas[2] == "escreva"):
-            proxToken()
             if(errado):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
                 buffer = ""
                 errado = False
+            buffer = buffer + " " + tuplas[2]
+            linha = tuplas[0]
+            proxToken()            
             i = ESCREVA()
             if(i == 1):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
+            buffer = ""
         #usar if ao inveis de elif para tratar erros,caso volte a recursão e ocorra erro, 
         # deve sempre testar todas as condições
         elif(tuplas[2] == "leia"): 
-            proxToken()
             if(errado):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
                 buffer = ""
                 errado = False
+            buffer = buffer + " " + tuplas[2]
+            linha = tuplas[0]
+            proxToken()            
             i = LEIA()
             if(i == 1):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
+            buffer = ""
         elif(tuplas[2] == "constantes"):
-            proxToken()
             if(errado):
-                output(linhaErro, "CmdMF", buffer)
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
                 buffer = ""
                 errado = False
-            i = CONSTANTES()
-            if(i == 1):
-                output(linhaErro, "CmdMF", buffer)
+            buffer = buffer + " " + tuplas[2]
+            proxToken()            
+            CONSTANTES()
+            buffer = ""
+        elif(tuplas[2] == "variaveis"):
+            if(errado):
+                output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
-                linhaErro = int(tuplas[0])
+                buffer = ""
+                errado = False
+            buffer = buffer + " " + tuplas[2]
+            proxToken()            
+            VARIAVEIS()
+            buffer = ""
         else:
             errado = True
             buffer = buffer + " " + tuplas[2]
             proxToken()            
-    print("Virou a nilce? Cadê a chave marreco?")
+    if(iterador<10):
+        aux = "0"+str(iterador)
+        output(int(aux), "CmdMF", "Fim do arquivo / falta o '}'")
+    else:    
+        output(iterador, "CmdMF", "Fim do arquivo / falta o '}'")
+    mantemToken()
     return retorno
 
 ########## Escreva ########
 
 def ESCREVA():
-    global tuplas
-    if(tuplas[2] == '('):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '(' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = ESCONT()
         if(i == 0):
-            if(tuplas[2] == ';'):
+            if(tuplas[2] == ';'and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 return 0
             else:
@@ -779,8 +796,9 @@ def ESCREVA():
         return 1
 
 def ESCONT():
-    global tuplas
-    if(tuplas[1] == "IDE"):
+    global tuplas, buffer, linha
+    if(tuplas[1] == "IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = ACESSOVAR()
         if(i == 0):
@@ -788,7 +806,8 @@ def ESCONT():
              return i
         else:
             return i
-    if(tuplas[1] == "CAR" or tuplas[1] == "CAD"):
+    if(tuplas[1] == "CAR" or tuplas[1] == "CAD" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = ESFIM()
         return i
@@ -796,11 +815,13 @@ def ESCONT():
         return 1
 
 def ESFIM():
-    global tuplas
-    if(tuplas[2] == ")"):
+    global tuplas, buffer, linha
+    if(tuplas[2] == ")" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[2] == ","):
+    elif(tuplas[2] == "," and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = ESCONT()
         return i
@@ -810,12 +831,14 @@ def ESFIM():
 ######## Leia #########
 
 def LEIA():
-    global tuplas
-    if(tuplas[2] == '('):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '(' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = LEIACONT()
         if(i == 0):
-            if(tuplas[2] == ';'):
+            if(tuplas[2] == ';' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 return 0
             else:
@@ -826,8 +849,9 @@ def LEIA():
         return 1
 
 def LEIACONT():
-    global tuplas
-    if(tuplas[1] == "IDE"):
+    global tuplas, buffer, linha
+    if(tuplas[1] == "IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = ACESSOVAR()
         if(i == 0):
@@ -839,11 +863,13 @@ def LEIACONT():
         return 1
 
 def LEIAFIM():
-    global tuplas
-    if(tuplas[2] == ")"):
+    global tuplas, buffer, linha
+    if(tuplas[2] == ")" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[2] == ","):
+    elif(tuplas[2] == "," and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = LEIACONT()
         return i
@@ -853,16 +879,21 @@ def LEIAFIM():
 ########### Acesso Var ##########
 
 def ACESSOVAR():
-    global tuplas
-    if(tuplas[2] == '.'):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '.' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'IDE'):
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == '['):
+            if(tuplas[2] == '[' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
-                if(tuplas[1] == 'NRO'):
+                if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
                     proxToken()
-                    if(tuplas[2] == ']'):
+                    if(tuplas[2] == ']' and linha == tuplas[0]):
+                        buffer = buffer + " " + tuplas[2]
                         proxToken()
                         i = ACESSOVARCONT()
                         return i
@@ -873,11 +904,14 @@ def ACESSOVAR():
             return 0
         else:
             return 1
-    elif(tuplas[2] == '['):
+    elif(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 i = ACESSOVARCONT()
                 return i
@@ -888,12 +922,15 @@ def ACESSOVAR():
     return 0
 
 def ACESSOVARCONT():
-    global tuplas
-    if(tuplas[2] == '['):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 i = ACESSOVARCONTB()
                 return i
@@ -904,12 +941,15 @@ def ACESSOVARCONT():
     return 0
 
 def ACESSOVARCONTB():
-    global tuplas
-    if(tuplas[2] == '['):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 return 0
             else:
@@ -918,41 +958,81 @@ def ACESSOVARCONTB():
             return 1
     return 0
 
-########## Constantes ##########
+########## Constantes e Variaveis##########
 
 def CONSTANTES():
-    global tuplas
+    global tuplas, buffer, linha, iterador
     if(tuplas[2]=="{"):
-        proxToken()
+        buffer = buffer + " " + tuplas[2]
+        proxToken()        
+        print(tuplas)
         i = CONST()
+        if(i == 1):            
+            output(int(linha), "CmdMF", buffer)
+            buffer = ""
+            mantemToken()
+            errado = False
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "CmdMF", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return 0
+                elif(tuplas[2] == ";"):
+                    if(errado):
+                        output(int(linha), "CmdMF", buffer)
+                        mantemToken()
+                        buffer = ""
+                    tuplas[2] = "{"
+                    return CONSTANTES()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "CmdMF", buffer)
+                        mantemToken()
+                        buffer = ""
+                    print(tuplas)
+                    iterador = iterador-1
+                    tuplas[2] = "{"
+                    print(tuplas)
+                    return CONSTANTES()
+                else:               
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
         return i
     return 1
 
 def CONST():
-    global tuplas
-    if(tuplas[2]== "inteiro" or tuplas[2]=="real" or tuplas[2]=="booleano" or tuplas[2]=="cadeia" or tuplas[2]=="char" or tuplas[1]=="IDE"):
-        proxToken()
+    global tuplas, buffer, linha
+    buffer = ""
+    linha = tuplas[0]
+    i = TIPO()
+    if(i==0):
         return CONSTALT()
-    else:    
-        return 1
+    else:
+        return i
 
 def CONSTCONT(): 
-    global tuplas
-    if(tuplas[2]== ","):
+    global tuplas, buffer
+    if(tuplas[2]== "," and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return CONSTALT()
-    elif(tuplas[2]== ";"):
+    elif(tuplas[2]== ";" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return CONSTFIM()
     else:
         return 1
 
 def CONSTALT():
-    if(tuplas[1]=="IDE"):
+    global tuplas, buffer, linha
+    if(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = VARINIT()
         if(i == 0):
-            #proxToken()
             return CONSTCONT()
         else:
             return i
@@ -960,21 +1040,107 @@ def CONSTALT():
         return 1 
 
 def CONSTFIM():
+    global tuplas, buffer
     if(tuplas[2]=="}"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
         return 0
     else:
         return CONST()
 
+def VARIAVEIS():
+    global tuplas, buffer
+    if(tuplas[2]=="{"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = VAR()
+        if(i == 1):
+            output(int(linha), "CmdMF", buffer)
+            buffer = ""
+            mantemToken()
+        return i
+    return 1
+
+def VAR():
+    global tuplas, buffer, linha
+    buffer = ""
+    linha = tuplas[0]
+    i = TIPO()
+    if(i==0):
+        return VARALT()
+    else:
+        return i
+
+def VARALT():
+    global tuplas, buffer, linha
+    if(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = VARCONT()
+        return i
+    else:
+        return 1 
+
+def VARCONT():
+    global tuplas, buffer
+    if(tuplas[2]== "," or tuplas[2]== ";"): #Conjunto first
+        return VARFINAL()        
+    else:
+        i = VARINIT()
+        if(i == 0):
+            return VARFINAL()
+        else:
+            return i
+        
+def VARFINAL():
+    global tuplas, buffer, linha
+    if(tuplas[2]== "," and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return VARALT()
+    elif(tuplas[2]== ";" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return VARFIM()
+    else:
+        return 1
+
+def VARFIM():
+    global tuplas, buffer
+    if(tuplas[2]=="}"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    else:
+        return VAR()
+
+def TIPO():
+    global tuplas, buffer, linha
+    if(tuplas[2]== "inteiro" or tuplas[2]=="real" or tuplas[2]=="booleano" or tuplas[2]=="cadeia" or tuplas[2]=="char" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return ACESSOVAR()
+    else:    
+        return 1
+
 def VARINIT():
-    global tuplas
-    if(tuplas[2] == '='):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '=' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return VALOR()
-    elif(tuplas[2] == '['):
+    elif(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 i = VARINITCONT()
                 return i
@@ -985,18 +1151,24 @@ def VARINIT():
     return 0
 
 def VARINITCONT():
-    if(tuplas[2] == '='):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '=' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[2] == '{'):
+        if(tuplas[2] == '{' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
             return VETOR()
         else:
             return 1 
-    elif(tuplas[2] == '['):
+    elif(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 i = VARINITCONTMATR()
                 return i
@@ -1007,14 +1179,19 @@ def VARINITCONT():
     return 0
 
 def VARINITCONTMATR():
-    if(tuplas[2] == '='):
+    global tuplas, buffer, linha
+    if(tuplas[2] == '=' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[2] == '{'):
+        if(tuplas[2] == '{' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
             i = VETOR()
-            if(tuplas[2] == ',' and i ==0):
+            if(tuplas[2] == ',' and i ==0 and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
                 if(tuplas[2] == '{'):
+                    buffer = buffer + " " + tuplas[2]
                     proxToken()
                     return VETOR()
                 else:
@@ -1023,25 +1200,34 @@ def VARINITCONTMATR():
                 return 1 
         else:
             return 1 
-    elif(tuplas[2] == '['):
+    elif(tuplas[2] == '[' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO'):
+        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
-            if(tuplas[2] == ']'):
+            if(tuplas[2] == ']' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
                 proxToken()
-                if(tuplas[2] == '='):
+                if(tuplas[2] == '=' and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
                     proxToken()
-                    if(tuplas[2] == '{'):
+                    if(tuplas[2] == '{' and linha == tuplas[0]):
+                        buffer = buffer + " " + tuplas[2]
                         proxToken()
                         i = VETOR()
-                        if(tuplas[2] == ',' and i ==0):
+                        if(tuplas[2] == ',' and i ==0 and linha == tuplas[0]):
+                            buffer = buffer + " " + tuplas[2]
                             proxToken()
-                            if(tuplas[2] == '{'):
+                            if(tuplas[2] == '{' and linha == tuplas[0]):
+                                buffer = buffer + " " + tuplas[2]
                                 proxToken()
                                 i = VETOR()
-                                if(tuplas[2] == ',' and i ==0):
+                                if(tuplas[2] == ',' and i ==0 and linha == tuplas[0]):
+                                    buffer = buffer + " " + tuplas[2]
                                     proxToken()
-                                    if(tuplas[2] == '{'):
+                                    if(tuplas[2] == '{' and linha == tuplas[0]):
+                                        buffer = buffer + " " + tuplas[2]
                                         proxToken()
                                         return VETOR()
                                     else:
@@ -1062,31 +1248,39 @@ def VARINITCONTMATR():
             return 1
     return 0
 def VETOR():
+    global tuplas, buffer
     i = VALOR()
     if(i == 0):
         return VETORCONT()
     return 1
 def VETORCONT():
-    if(tuplas[2]=="}"):
+    global tuplas, buffer, linha
+    if(tuplas[2]=="}" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[2]==","):
+    elif(tuplas[2]=="," and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return VETOR()
     else:
         return 1
     
 def VALOR():
-    if(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[1]=="CAR" or tuplas[1]=="CAD" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso"):
+    global tuplas, buffer, linha
+    if(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[1]=="CAR" or tuplas[1]=="CAD" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[2]== "-"):
+    elif(tuplas[2]== "-" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1]== "NRO"):
+        if(tuplas[1]== "NRO" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
             proxToken()
             return 0
         return 1
-    proxToken()
+    #proxToken()
     return 0
 
 ################################################# MAIN ####################################################

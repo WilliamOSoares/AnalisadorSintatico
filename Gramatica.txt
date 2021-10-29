@@ -107,7 +107,7 @@
 			| char
 			| registro							
 
-		<VAR> ::=  <TIPO> <IDE> <VARCONT>
+		<VAR> ::=  <TIPO> <VARALT>
 		<VARALT> ::= <IDE> <VARCONT>
 		<VARCONT> ::= <VARINIT> <VARFINAL>
 			| <VARFINAL>
@@ -189,9 +189,9 @@
 
 	<REGISTRO> ::= <IDE> { <VAR> }
 
-	<ACESSOVAR> ::= <IDE> <ACESSOVARCONT>
+	###<ACESSOVAR> ::= <IDE> <ACESSOVARCONT>
 
-	<ACESSOVARCONT> ::= .<ACESSOVAR>
+	<ACESSOVARCONT> ::= . <IDE> [<NRO>] <ACESSOVARCONTB>
 		| [<NRO>] <ACESSOVARCONTB>	
 		| <>
 	<ACESSOVARCONTB>::= [<NRO>] <ACESSOVARCONTC>

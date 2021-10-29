@@ -1,1 +1,2 @@
-SUCESSO!
+06 CmdMF  real madrid = "falso"
+06 CmdMF  int a = 2
