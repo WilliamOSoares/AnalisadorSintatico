@@ -4,13 +4,12 @@ algoritmo{
     constantes{
         inteiro a[2][2][2] = {2,2},{2},{3,2,1};
         real madrid = "falso";
-        booleano a = "True";
+        booleano a = 2+2 && 2;
     }
     variaveis{
         inteiro a,b,c;
-        real sociedad = 1.1;
+        real sociedad = - 1.1;
         real valladolid = 11.1;
         cadeia a = False;
     }
 }
-
