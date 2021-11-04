@@ -20,7 +20,7 @@ algoritmo{
     } senao {
         escreva(a);
     }
-    enquanto(a==b){
+    enquanto(((((2+2 >= 2)|| 2+2 > 2)|| 2+2 > 2))){
         escreva(c);
     }
     para(i=2+2; a==b; i++){

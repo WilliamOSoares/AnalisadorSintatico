@@ -997,7 +997,7 @@ def ENQUANTO():
     if(tuplas[2] == '(' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        i = EXPRESSAO()
+        i = EXPRESSAOB()
         if(i == 0):
             if(tuplas[2] == ')' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
@@ -1547,7 +1547,7 @@ def VALOR():
         proxToken()
         return 0
     elif(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso" or tuplas[2]=="(" or tuplas[2]=="-" or tuplas[2]=="!" and linha == tuplas[0]):
-        return EXPRESSAOALT()
+        return EXPRESSAOB()
     return 1
 
 def NEGATIVO():
@@ -1565,6 +1565,7 @@ def NEGATIVO():
 ############################################ EXPRESSOES ####################################################
 def EXPRESSAO():
     global tuplas, buffer, linha
+    print("Expressao foi usada")
     if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -1572,7 +1573,121 @@ def EXPRESSAO():
     elif(tuplas[2]=="(" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        i = EXPRESSAO()
+        i = EXPRESSAOB()
+        if(i==0):
+            if(tuplas[2]==")" and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                return EXPRESSAOCONTB()
+            else:
+                return 1
+        return i
+    elif(tuplas[2]=="!" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPREXC()
+    elif(tuplas[2]=="-" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = NEGATIVO()
+        if(i==0):
+            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
+                i = EXPARITMETICACONT()
+                if(i==0):
+                    return EXPRESSAOCONT()
+                else:
+                    return i
+            else:
+                return EXPRESSAOCONT()
+        return i        
+    elif(tuplas[1]=="NRO" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
+            i = EXPARITMETICACONT()
+            if(i==0):
+                return EXPRESSAOCONT()
+            else:
+                return i
+        else:
+            return EXPRESSAOCONT()
+    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = ACESSOVAR()
+        if(i==0):
+            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
+                i = EXPARITMETICACONT()
+                if(i==0):
+                    return EXPRESSAOCONT()
+                else:
+                    return i
+            else:
+                return EXPRESSAOCONT()
+        return i
+    elif(tuplas[1]=="CAD" or tuplas[1]=="CAR" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPRESSAOCONT()
+    else:
+        return 1
+
+def EXPREXC():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPRESSAOCONT()
+    elif(tuplas[2]=="(" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = EXPRESSAOB()
+        if(i==0):
+            if(tuplas[2]==")" and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                return EXPRESSAOCONTB()
+            else:
+                return 1
+        return i
+    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = ACESSOVAR()
+        if(i==0):
+            return EXPRESSAOCONT()
+        return i
+    else:
+        return 1
+
+def EXPRESSAOCONT():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="&&" or tuplas[2]=="||" or tuplas[2]=="==" or tuplas[2]=="!=" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPRESSAOB()
+    else:
+        return 1
+
+def EXPRESSAOCONTB():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="&&" or tuplas[2]=="||" or tuplas[2]=="==" or tuplas[2]=="!=" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPRESSAOB()
+    else:
+        return 0
+
+def EXPRESSAOB():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return EXPRESSAOCONTB()
+    elif(tuplas[2]=="(" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = EXPRESSAOB()
         if(i==0):
             if(tuplas[2]==")" and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
@@ -1597,7 +1712,7 @@ def EXPRESSAO():
                 else:
                     return i
             else:
-                return EXPRESSAOCONT()
+                return EXPRESSAOCONTB()
         return i        
     elif(tuplas[1]=="NRO" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
@@ -1609,7 +1724,7 @@ def EXPRESSAO():
             else:
                 return i
         else:
-            return EXPRESSAOCONT()
+            return EXPRESSAOCONTB()
     elif(tuplas[1]=="IDE" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -1622,249 +1737,14 @@ def EXPRESSAO():
                 else:
                     return i
             else:
-                return EXPRESSAOCONT()
+                return EXPRESSAOCONTB()
         return i
-    else:
-        return 1
-
-def EXPREXC():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
+    elif(tuplas[1]=="CAD" or tuplas[1]=="CAR" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
         return EXPRESSAOCONTB()
-    elif(tuplas[2]=="(" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = EXPRESSAO()
-        if(i==0):
-            if(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                return EXPRESSAOCONTB()
-            else:
-                return 1
-        return i
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = ACESSOVAR()
-        if(i==0):
-            return EXPRESSAOCONTB()
-        return i
     else:
         return 1
-
-def EXPRESSAOCONT():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAO()
-    elif(tuplas[2]=="==" or tuplas[2]=="!=" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRELACIONALB()
-    else:
-        return 1
-
-def EXPRESSAOCONTB():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAO()
-    elif(tuplas[2]=="==" or tuplas[2]=="!=" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRELACIONALB()
-    else:
-        return 0
-
-def EXPRELACIONALB():
-    global tuplas, buffer, linha
-    if(tuplas[1]=="CAR" or tuplas[1]=="CAD" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return 0
-    elif(tuplas[2]=="(" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = EXPRESSAO()
-        if(i==0):
-            if(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                return 0
-            else:
-                return 1
-        return i
-    elif(tuplas[2]=="-" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = NEGATIVO()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                return EXPARITMETICACONT()
-            else:
-                return 0
-        return i   
-    elif(tuplas[1]=="NRO" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-            return EXPARITMETICACONT()
-        else:
-            return 0
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = ACESSOVAR()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                return EXPARITMETICACONT()
-            else:
-                return 0
-        return i
-    else:
-        return 1
-
-def EXPRESSAOALT():
-    global tuplas, buffer, linha, looping
-    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        if(tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
-            return 1
-        else:
-            looping = True
-            return EXPRESSAOCONTC()
-    elif(tuplas[2]=="(" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        looping = True
-        i = EXPRESSAOALT()
-        if(i==0):
-            if(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                return EXPRESSAOCONTC()
-            else:
-                return 1
-        return i
-    elif(tuplas[2]=="!" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        looping = True
-        return EXPREXCALT()
-    elif(tuplas[2]=="-" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        looping = True
-        i = NEGATIVO()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                i = EXPARITMETICACONT()
-                if(i==0):
-                    if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-                        return 1
-                    else:
-                        return EXPRESSAOCONTC()
-                else:
-                    return i
-            else:
-                if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-                    return 1
-                else:
-                    return EXPRESSAOCONTC()
-        return i        
-    elif(tuplas[1]=="NRO" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        looping = True
-        if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-            i = EXPARITMETICACONT()
-            if(i==0):
-                x = precToken()
-                if(tuplas[2]=="&&" or tuplas[2]=="||" and x=="<=" or x==">=" or x=="<" or x==">" and linha == tuplas[0]):
-                    return 1
-                else:
-                    return EXPRESSAOCONTC()
-            else:
-                return i
-        else:
-            if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-                return 1
-            else:
-                return EXPRESSAOCONTC()
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        looping = True
-        i = ACESSOVAR()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                i = EXPARITMETICACONT()
-                if(i==0):
-                    if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-                        return 1
-                    else:
-                        return EXPRESSAOCONTC()
-                else:
-                    return i
-            else:
-                return EXPRESSAOCONTC()
-        return i
-    else:
-        x = precToken()
-        if(x=="&&" or x=="||" or x=="<=" or x==">=" or x=="<" or x==">" and looping):
-            return 0
-        else:
-            return 1
-
-def EXPREXCALT():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        if(tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
-            return 1
-        else:
-            return EXPRESSAOCONTC()
-    elif(tuplas[2]=="(" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = EXPRESSAOALT()
-        if(i==0):
-            if(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                return EXPRESSAOCONTC()
-            else:
-                return 1
-        return i
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = ACESSOVAR()
-        if(i==0):
-            return EXPRESSAOCONTC()
-        return i
-    else:
-        return 1
-
-def EXPRESSAOCONTC():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="&&" or tuplas[2]=="||" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAOALT()
-    elif(tuplas[2]=="==" or tuplas[2]=="!=" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAOALT()
-    else:
-        return 0
 
 def EXPARITMETICA():
     global tuplas, buffer, linha
