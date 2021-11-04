@@ -4,12 +4,30 @@ algoritmo{
     constantes{
         inteiro a[2][2][2] = {2,2},{2},{3,2,1};
         real madrid = "falso";
-        booleano a = 2+2 && 2;
+        booleano a = 2;
     }
     variaveis{
         inteiro a,b,c;
         real sociedad = - 1.1;
         real valladolid = 11.1;
         cadeia a = False;
+    }
+    se(a==a){
+        escreva(a);
+    }
+    se(b==b){
+        escreva(b);
+    } senao {
+        escreva(a);
+    }
+    enquanto(a==b){
+        escreva(c);
+    }
+    para(i=2+2; a==b; i++){
+        escreva(d);
+    }
+    registro a {
+        inteiro a;
+        real mallorca = 1.1;
     }
 }
