@@ -1,10 +1,21 @@
+constantes{
+    inteiro a[2][2][2] = {2,2},{2},{3,2,1};
+    real madrid = "falso";
+    booleano a = a(a,a>4,a&&e,true,2+2);
+}
+variaveis{
+    inteiro a,b,c;
+    real sociedad = - 1.1;
+    real valladolid = 11.1;
+    cadeia a = False;
+
 algoritmo{
     escreva(a);
     leia(a.a[2]);
     constantes{
         inteiro a[2][2][2] = {2,2},{2},{3,2,1};
         real madrid = "falso";
-        booleano a = 2;
+        booleano a = a(a,a>4,a&&e,true,2+2);
     }
     variaveis{
         inteiro a,b,c;
@@ -12,6 +23,10 @@ algoritmo{
         real valladolid = 11.1;
         cadeia a = False;
     }
+    % OPA eae véi blz?
+    {# jajajaja #}
+    a = 's';
+    a(a,v,g);
     se(a==a){
         escreva(a);
     }
@@ -20,7 +35,7 @@ algoritmo{
     } senao {
         escreva(a);
     }
-    enquanto(((((2+2 >= 2)|| 2+2 > 2)|| 2+2 > 2))){
+    enquanto(2>(2>(2>2))){
         escreva(c);
     }
     para(i=2+2; a==b; i++){

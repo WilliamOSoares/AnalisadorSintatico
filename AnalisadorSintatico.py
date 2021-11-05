@@ -699,12 +699,100 @@ def precToken():
 def START():
     global tuplas, buffer
     if(tuplas[2] == "algoritmo"):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
-        i = ALGORITMO()
+        ALGORITMO()
+    elif(tuplas[2] == "funcao"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        FUNCAO()
+        START()
+    elif(tuplas[2] == "constantes"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        CONSTANTES()
+        B()
+    elif(tuplas[2] == "variaveis"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        VARIAVEIS()
+        A()
+    elif(tuplas[2] == "registro"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        REGISTRO()
+        START()
     else:
         output(int(tuplas[0]), "CmdMF", tuplas[2])
         mantemToken()
 
+def A():
+    global tuplas, buffer
+    if(tuplas[2] == "algoritmo"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        ALGORITMO()
+    elif(tuplas[2] == "funcao"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        FUNCAO()
+        A()
+    elif(tuplas[2] == "constantes"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        CONSTANTES()
+        C()
+    elif(tuplas[2] == "registro"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        REGISTRO()
+        A()
+    else:
+        output(int(tuplas[0]), "CmdMF", tuplas[2])
+        mantemToken()
+def B():
+    global tuplas, buffer
+    if(tuplas[2] == "algoritmo"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        ALGORITMO()
+    elif(tuplas[2] == "funcao"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        FUNCAO()
+        B()
+    elif(tuplas[2] == "variaveis"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        VARIAVEIS()
+        A()
+    elif(tuplas[2] == "registro"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        REGISTRO()
+        B()
+    else:
+        output(int(tuplas[0]), "CmdMF", tuplas[2])
+        mantemToken()
+def C():
+    global tuplas, buffer
+    if(tuplas[2] == "algoritmo"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        ALGORITMO()
+    elif(tuplas[2] == "funcao"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        FUNCAO()
+        C()
+    elif(tuplas[2] == "registro"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        REGISTRO()
+        C()
+    else:
+        output(int(tuplas[0]), "CmdMF", tuplas[2])
+        mantemToken()
 
 def ALGORITMO():
     global tuplas, buffer
@@ -718,7 +806,6 @@ def CONTEUDO():
     global tuplas, iterador, dados, buffer, linha   ### COLOCAR O BUFFER GLOBAL PARA PERGAR DO INICIO DO ERRO ATÉ O FINAL "LEIA"
     errado = False
     retorno = 0
-    x = True
     while(tuplas[2]!="$"):
         if(tuplas[2] == "}"):
             if(errado):
@@ -833,6 +920,54 @@ def CONTEUDO():
                 buffer = buffer + " " + tuplas[2]
                 proxToken()
                 i = REGISTRO()
+            if(i == 1):
+                output(int(tuplas[0]), "CmdMF", buffer)
+                mantemToken()
+            buffer = ""  
+        elif(tuplas[2] == "retorno"): 
+            if(errado):
+                output(int(tuplas[0]), "CmdMF", buffer)
+                mantemToken()
+                buffer = ""
+                errado = False
+            buffer = buffer + " " + tuplas[2]
+            linha = tuplas[0]
+            proxToken()            
+            i = RETORNO()
+            if(i == 1):
+                output(int(tuplas[0]), "CmdMF", buffer)
+                mantemToken()
+            buffer = "" 
+        elif(tuplas[1] == "IDE"): 
+            if(errado):
+                output(int(tuplas[0]), "CmdMF", buffer)
+                mantemToken()
+                buffer = ""
+                errado = False
+            linha = tuplas[0]       
+            if(dados[iterador][2] == '(' and linha == tuplas[0]):
+                i = CHAMADAFUNCAO()
+                if(i==0): 
+                    if(tuplas[2]==";" and linha == tuplas[0]):
+                        buffer = buffer + " " + tuplas[2]
+                        proxToken()  
+                    else:
+                        i=1  
+            elif(dados[iterador][2] == '=' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                if(tuplas[2] == '=' and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+                    i = EXPRESSAOB()
+                    if(i==0): 
+                        if(tuplas[2]==";" and linha == tuplas[0]):
+                            buffer = buffer + " " + tuplas[2]
+                            proxToken()  
+                        else:
+                            i=1
+                else:
+                    i=1
             if(i == 1):
                 output(int(tuplas[0]), "CmdMF", buffer)
                 mantemToken()
@@ -957,7 +1092,7 @@ def SE():
     if(tuplas[2] == '(' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        i = EXPRESSAO()
+        i = EXPRESSAOB()
         if(i == 0):
             if(tuplas[2] == ')' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
@@ -1048,7 +1183,7 @@ def PARA():
 
 def PARACONT():
     global tuplas, buffer, linha
-    i = EXPRESSAO()
+    i = EXPRESSAOB()
     if(i==0):
         if(tuplas[2] == ';' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
@@ -1203,7 +1338,161 @@ def ACESSOVARCONTB():
             return 1
     return 0
 
-########################################## Constantes e Variaveis#######################################
+###################################### Função, Chamada de função e retorno ####################################  
+
+def FUNCAO ():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="vazio" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()  
+        if(tuplas[1]=="IDE" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()  
+            return FUNCAOINIT()
+    else:
+        i = TIPOA()
+        if(i==0): 
+            i = TIPOCONT()
+            if(i==0): 
+                if(tuplas[1]=="IDE" and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()  
+                    return FUNCAOINIT()
+                else:
+                    return 1                
+            return i
+        return i
+
+def FUNCAOINIT():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="(" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()  
+        i = PARANINIT()
+        if(i==0): 
+            if(tuplas[2] == '{'):
+                    buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+            else:
+                return 1               
+        return i
+    else:
+        return 1
+def TIPOCONT():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="[" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()  
+        if(tuplas[2]=="]" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()  
+            return VETORMAIS()
+        else:
+            return 1
+    else:
+        return 0
+
+def VETORMAIS():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="[" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()  
+        if(tuplas[2]=="]" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()  
+            return VETORMAISUM()
+        else:
+            return 1
+    else:
+        return 0
+
+def VETORMAISUM():
+    global tuplas, buffer, linha
+    if(tuplas[2]=="[" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()  
+        if(tuplas[2]=="]" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()  
+            return 0
+        else:
+            return 1
+    else:
+        return 0
+
+def PARANINIT():
+    global tuplas, buffer, linha
+    i = TIPOA()
+    if(i==0): 
+        if(tuplas[1]=="IDE" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()  
+            if(tuplas[2]=="," and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()  
+                return PARANINIT()
+            elif(tuplas[2]==")" and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()  
+                return 0
+            else:
+                return 1
+        else:
+            return 1
+    return i
+
+def CHAMADAFUNCAO():
+    global tuplas, buffer, linha  
+    if(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()    
+        if(tuplas[2]=="(" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken() 
+            return PARAN()
+    else:
+        return 1
+    
+def PARAN():
+    global tuplas, buffer, linha  
+    if(tuplas[2]==")" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken() 
+        return 0   
+    else:
+        return PARANCONT()
+
+def PARANCONT():
+    global tuplas, buffer, linha  
+    i = VALOR()
+    if(i==0): 
+        if(tuplas[2]=="," and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken() 
+            return PARANCONT()   
+        elif(tuplas[2]==")" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken() 
+            return 0  
+        else:
+            return 1
+    else:
+        return i
+
+def RETORNO():
+    global tuplas, buffer, linha  
+    i = VALOR()
+    if(i==0): 
+        if(tuplas[2]==";" and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken() 
+            return 0 
+        else:
+            return 1
+    return i
+
+########################################## Constantes e Variaveis #######################################
 
 def CONSTANTES():
     global tuplas, buffer, linha, iterador
@@ -1393,10 +1682,15 @@ def TIPO():
         buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
+    else:    
+        return 1
+
+def TIPOA():
+    global tuplas, buffer, linha
+    if(tuplas[2]== "inteiro" or tuplas[2]=="real" or tuplas[2]=="booleano" or tuplas[2]=="cadeia" or tuplas[2]=="char" or tuplas[2]=="registro" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        return ACESSOVAR()
+        return 0
     else:    
         return 1
 
@@ -1540,13 +1834,18 @@ def VETORCONT():
         return 1
     
 def VALOR():
-    global tuplas, buffer, linha
+    global tuplas, buffer, linha, iterador, dados
     #if(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[1]=="CAR" or tuplas[1]=="CAD" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
     if(tuplas[1]=="CAR" or tuplas[1]=="CAD" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
         return 0
-    elif(tuplas[1]== "NRO" or tuplas[1]=="IDE" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso" or tuplas[2]=="(" or tuplas[2]=="-" or tuplas[2]=="!" and linha == tuplas[0]):
+    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
+        if(dados[iterador][2] == "("):
+            return CHAMADAFUNCAO()
+        else:
+            return EXPRESSAOB()
+    elif(tuplas[1]== "NRO" or tuplas[2]=="verdadeiro" or tuplas[2]=="falso" or tuplas[2]=="(" or tuplas[2]=="-" or tuplas[2]=="!" and linha == tuplas[0]):
         return EXPRESSAOB()
     return 1
 
@@ -1563,81 +1862,12 @@ def NEGATIVO():
     return 1
 
 ############################################ EXPRESSOES ####################################################
-def EXPRESSAO():
-    global tuplas, buffer, linha
-    print("Expressao foi usada")
-    if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAOCONT()
-    elif(tuplas[2]=="(" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = EXPRESSAOB()
-        if(i==0):
-            if(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                return EXPRESSAOCONTB()
-            else:
-                return 1
-        return i
-    elif(tuplas[2]=="!" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPREXC()
-    elif(tuplas[2]=="-" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = NEGATIVO()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                i = EXPARITMETICACONT()
-                if(i==0):
-                    return EXPRESSAOCONT()
-                else:
-                    return i
-            else:
-                return EXPRESSAOCONT()
-        return i        
-    elif(tuplas[1]=="NRO" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-            i = EXPARITMETICACONT()
-            if(i==0):
-                return EXPRESSAOCONT()
-            else:
-                return i
-        else:
-            return EXPRESSAOCONT()
-    elif(tuplas[1]=="IDE" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        i = ACESSOVAR()
-        if(i==0):
-            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
-                i = EXPARITMETICACONT()
-                if(i==0):
-                    return EXPRESSAOCONT()
-                else:
-                    return i
-            else:
-                return EXPRESSAOCONT()
-        return i
-    elif(tuplas[1]=="CAD" or tuplas[1]=="CAR" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAOCONT()
-    else:
-        return 1
-
 def EXPREXC():
     global tuplas, buffer, linha
     if(tuplas[2]=="verdadeiro" or tuplas[2]=="falso" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        return EXPRESSAOCONT()
+        return EXPRESSAOCONTB()
     elif(tuplas[2]=="(" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -1655,17 +1885,8 @@ def EXPREXC():
         proxToken()
         i = ACESSOVAR()
         if(i==0):
-            return EXPRESSAOCONT()
+            return EXPRESSAOCONTB()
         return i
-    else:
-        return 1
-
-def EXPRESSAOCONT():
-    global tuplas, buffer, linha
-    if(tuplas[2]=="&&" or tuplas[2]=="||" or tuplas[2]=="==" or tuplas[2]=="!=" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">" and linha == tuplas[0]):
-        buffer = buffer + " " + tuplas[2]
-        proxToken()
-        return EXPRESSAOB()
     else:
         return 1
 
@@ -1996,3 +2217,4 @@ else:
         erros.clear()
         dados.clear()
         tuplas.clear()
+        iterador=0

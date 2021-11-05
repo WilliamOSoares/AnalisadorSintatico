@@ -1,1 +1,1 @@
-10 CmdMF $
+01 CmdMF inteiro

@@ -66,16 +66,17 @@
 		| escreva <ESCREVA><CONTEUDO>
 		| para <PARA><CONTEUDO>
 		| registro <REGISTRO><CONTEUDO> 
-		| <ACESSOVAR> = <EXPATRIBUICAO>;<CONTEUDO>
-		| retorno <RETORNO>;
+		| <ACESSOVAR> = <EXPRESSAOB>;<CONTEUDO>
+		| <CHAMADAFUNCAO> ;<CONTEUDO>
+		| retorno <RETORNO>
 		| }
 	
 ########### COMANDOS #################
 
 	<ALGORITMO> ::= { <CONTEUDO> 
 
-	<FUNCAO> ::= <TIPO> <TIPOCONT> <IDE> <FUNCAOINIT>
-		| vazio <TIPOCONT> <IDE> <FUNCAOINIT>
+	<FUNCAO> ::= <TIPOA> <TIPOCONT> <IDE> <FUNCAOINIT>
+		| vazio <IDE> <FUNCAOINIT>
 	<FUNCAOINIT> ::= (<PARANINIT> { <CONTEUDO> }
 	<TIPOCONT>::= [] <VETORMAIS>
 		| <>
@@ -84,13 +85,13 @@
 	<VETORMAISUM> ::= [] 
 		| <>
 
-	<PARANINIT> ::= <TIPO> <IDE> <PARAINITCONT>
+	<PARANINIT> ::= <TIPOA> <IDE> <PARAINITCONT>
 	<PARAINITCONT> ::= , <PARANINIT>
 		| )
 
 	<RETORNO> ::= <VALOR> ;
 
-	<CHAMADAFUNCAO> ::= (<PARAN>
+	<CHAMADAFUNCAO> ::= <IDE> (<PARAN>
 	<PARAN> ::= <PARANCONT> 
 		| )
 	<PARANCONT> ::= <VALOR> <PARANFIM> 
@@ -105,7 +106,12 @@
 			| booleano
 			| cadeia
 			| char
-			| registro							
+		<TIPOA> ::= inteiro
+			| real
+			| booleano
+			| cadeia
+			| char
+			| registro						
 
 		<VAR> ::=  <TIPO> <VARALT>
 		<VARALT> ::= <IDE> <VARCONT>
