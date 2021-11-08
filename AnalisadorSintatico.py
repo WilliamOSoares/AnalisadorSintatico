@@ -689,12 +689,13 @@ def START():
         ALGORITMO()
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
-        proxToken()
+        linha = tuplas[0]
+        proxToken()        
         i = FUNCAO()
         if(i==1):
             output(int(tuplas[0]), "SyntaxError", buffer)
             mantemToken()
-            buffer = ""
+        buffer = ""
         START()
     elif(tuplas[2] == "constantes"):
         buffer = buffer + " " + tuplas[2]
@@ -705,6 +706,7 @@ def START():
             mantemToken()
             buffer = ""
             START()
+        buffer = ""
         B()
     elif(tuplas[2] == "variaveis"):
         buffer = buffer + " " + tuplas[2]
@@ -715,6 +717,7 @@ def START():
             mantemToken()
             buffer = ""
             START()
+        buffer = ""
         A()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
@@ -770,12 +773,13 @@ def A():
         ALGORITMO()
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
         i = FUNCAO()
         if(i==1):
             output(int(tuplas[0]), "SyntaxError", buffer)
             mantemToken()
-            buffer = ""
+        buffer = ""
         A()
     elif(tuplas[2] == "constantes"):
         buffer = buffer + " " + tuplas[2]
@@ -786,6 +790,7 @@ def A():
             mantemToken()
             buffer = ""
             A()
+        buffer = ""
         C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
@@ -840,12 +845,13 @@ def B():
         ALGORITMO()
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
         i = FUNCAO()
         if(i==1):
             output(int(tuplas[0]), "SyntaxError", buffer)
             mantemToken()
-            buffer = ""
+        buffer = ""
         B()
     elif(tuplas[2] == "variaveis"):
         buffer = buffer + " " + tuplas[2]
@@ -856,6 +862,7 @@ def B():
             mantemToken()
             buffer = ""
             B()
+        buffer = ""
         C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
@@ -910,12 +917,13 @@ def C():
         ALGORITMO()
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
         i = FUNCAO()
         if(i==1):
             output(int(tuplas[0]), "SyntaxError", buffer)
             mantemToken()
-            buffer = ""
+        buffer = ""
         C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
@@ -971,7 +979,8 @@ def ALGORITMO():
         i = CONTEUDO()
         if(i==0):
             buffer=""
-            proxToken()
+            #proxToken()
+        linha = tuplas[0]
     foraEscopo = False
     while(tuplas[2]!="$"):
         if(not(foraEscopo)):
@@ -1857,10 +1866,11 @@ def ACESSOVARCONTB():
 ###################################### Função, Chamada de função e retorno ####################################  
 
 def FUNCAO ():
-    global tuplas, buffer, linha
+    global tuplas, buffer, linha, dados
     if(tuplas[2]=="vazio" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
-        proxToken()  
+        proxToken() 
+        #print(dados)
         if(tuplas[1]=="IDE" and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()  
@@ -1938,7 +1948,7 @@ def VETORMAISUM():
         return 0
 
 def PARANINIT():
-    global tuplas, buffer, linha
+    global tuplas, buffer, linha, dados
     i = TIPOA()
     if(i==0): 
         if(tuplas[1]=="IDE" and linha == tuplas[0]):
@@ -2747,6 +2757,6 @@ else:
             buffer=""
         countArq+=1
         erros.clear()
-        dados.clear()
+        dados=[]
         tuplas.clear()
         iterador=0

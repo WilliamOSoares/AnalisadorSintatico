@@ -10,6 +10,11 @@ variaveis{
     cadeia a = False;
 }
 
+funcao vazio soma (inteiro e){
+	c = e + f;
+	escreva(c);
+}
+
 algoritmo{
     escreva(a);
     leia(a.a[2]);
@@ -46,4 +51,10 @@ algoritmo{
         inteiro a;
         real mallorca = 1.1;
     }
+}
+variaveis{
+    inteiro a,b,c;
+    real sociedad = - 1.1;
+    real valladolid = 11.1;
+    cadeia a = False;
 }

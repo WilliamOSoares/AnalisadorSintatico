@@ -5,7 +5,7 @@ Variaveis{
 	}
 
 % funcao de somar
-funcao vazio soma (inteiro e,){
+funcao vazio soma (inteiro e, real g){
 	c = e + f;
 	escreva(c);
 	}
