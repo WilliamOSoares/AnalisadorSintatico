@@ -38,7 +38,7 @@ algoritmo {
     enquanto(a){escreva("oi");}
     enquanto(a >= b){leia(b); se(a > b){escreva("hello world");}}
     para(a = 0; a <= 10; a++){leia(a);}
-    se(a == b){x = inicializafunc(vazio);}
+    se(a == b){x = inicializafunc(a[2][y],a[x][y][z]);}
 }
 
 

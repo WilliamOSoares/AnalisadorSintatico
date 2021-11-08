@@ -1,0 +1,3 @@
+16 SyntaxError  c = a . a [ 3 + 3 ] [ c ] [ 2 ] ;
+17 SyntaxError  g = a . madrid
+17 SyntaxError  = a . a ;

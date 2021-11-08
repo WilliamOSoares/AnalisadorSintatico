@@ -730,7 +730,7 @@ def START():
             if(i==1):
                 output(int(tuplas[0]), "SyntaxError", buffer)
                 mantemToken()
-                buffer = ""
+            buffer = ""
         START()
     else:    
         errado = False
@@ -803,7 +803,7 @@ def A():
             if(i==1):
                 output(int(tuplas[0]), "SyntaxError", buffer)
                 mantemToken()
-                buffer = ""
+            buffer = ""
         A()
     else:    
         errado = False
@@ -875,7 +875,7 @@ def B():
             if(i==1):
                 output(int(tuplas[0]), "SyntaxError", buffer)
                 mantemToken()
-                buffer = ""
+            buffer = ""
         B()
     else:    
         errado = False
@@ -936,7 +936,7 @@ def C():
             if(i==1):
                 output(int(tuplas[0]), "SyntaxError", buffer)
                 mantemToken()
-                buffer = ""
+            buffer = ""
         C()
     else:    
         errado = False
@@ -1326,7 +1326,7 @@ def CONTEUDO():
                 #buffer = ""
                 return 0           
     elif(tuplas[1] == "IDE"): 
-        linha = tuplas[0]       
+        linha = tuplas[0]      
         if(dados[iterador][2] == '(' and linha == tuplas[0]):
             i = CHAMADAFUNCAO()
             if(i==0): 
@@ -1382,7 +1382,7 @@ def CONTEUDO():
             proxToken()
             if(tuplas[2] == '=' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
-                proxToken()
+                proxToken()                
                 i = EXPATRIBUICAOB()
                 if(i==0): 
                     if(tuplas[2]==";" and linha == tuplas[0]):
@@ -1494,6 +1494,7 @@ def CONTEUDO():
                     output(int(linha), "SyntaxError", buffer)
                     mantemToken()
                     buffer = ""
+                proxToken()
                 return CONTEUDO()
             elif(linha != tuplas[0]):
                 if(errado):
@@ -1819,7 +1820,7 @@ def ACESSOVAR():
             if(tuplas[2] == '[' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
                 proxToken()
-                if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+                if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
                     buffer = buffer + " " + tuplas[2]
                     proxToken()
                     if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -1837,7 +1838,7 @@ def ACESSOVAR():
     elif(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -1856,7 +1857,7 @@ def ACESSOVARCONT():
     if(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -1875,7 +1876,7 @@ def ACESSOVARCONTB():
     if(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -2267,7 +2268,7 @@ def VARINIT():
     elif(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -2295,7 +2296,7 @@ def VARINITCONT():
     elif(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):
@@ -2334,7 +2335,7 @@ def VARINITCONTMATR():
     elif(tuplas[2] == '[' and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        if(tuplas[1] == 'NRO' and linha == tuplas[0]):
+        if(tuplas[1] == 'NRO' or tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()
             if(tuplas[2] == ']' and linha == tuplas[0]):

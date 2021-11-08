@@ -123,10 +123,13 @@
 			| }
 		<VARINIT> ::= = <VALOR>
 			| [<NRO>] <VARINITCONT>
+			| [<IDE>] <VARINITCONT>
 		<VARINITCONT>::= = { <VETOR> 
 			| [<NRO>] <VARINITCONTMATR>
+			| [<IDE>] <VARINITCONTMATR>
 		<VARINITCONTMATR>::= = { <VETOR> , { <VETOR>
 			| [<NRO>] = { <VETOR> , { <VETOR> , { <VETOR>
+			| [<IDE>] = { <VETOR> , { <VETOR> , { <VETOR>
 		
 		<VETOR> ::= <VALOR> <VETORCONT>
 		<VETORCONT> ::= , <VETOR>
@@ -177,12 +180,16 @@
 	<REGISTRO> ::= <IDE> { <VAR> 
 
 	<ACESSOVAR> ::= . <IDE> [<NRO>] <ACESSOVARCONTB>
+		| . <IDE> [<IDE>] <ACESSOVARCONTB>
 		| [<NRO>] <ACESSOVARCONTB>	
+		| [<IDE>] <ACESSOVARCONTB>	
 		| <>
 	<ACESSOVARCONT>::= [<NRO>] <ACESSOVARCONTC>
+		| [<IDE>] <ACESSOVARCONTC>
 		| .<ACESSOVAR>
 		| <>
 	<ACESSOVARCONTB>::= [<NRO>]
+		| [<IDE>]
 		| .<ACESSOVAR>
 		| <>
 
