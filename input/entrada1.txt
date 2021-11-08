@@ -15,6 +15,16 @@ funcao vazio soma (inteiro e){
 	escreva(c);
 }
 
+funcao inteiro soma (inteiro e){
+	c = e + f;
+	escreva(c);
+    se(a>b){
+        retorno a;
+    }
+    retorno c;
+    leia(c);
+}
+
 algoritmo{
     escreva(a);
     leia(a.a[2]);
@@ -29,6 +39,7 @@ algoritmo{
         real valladolid = 11.1;
         cadeia a = False;
     }
+    
     % OPA eae véi blz?
     {# jajajaja #}
     a = 's';

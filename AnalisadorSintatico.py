@@ -12,7 +12,7 @@ skip = False #Usado para pular linha
 endRead = False #Acaba a leitura de arquivos
 pre = ["algoritmo","variaveis","constantes","registro","funcao","retorno","vazio","se","senao","enquanto","para","leia","escreva","inteiro","real","booleano","char","cadeia","verdadeiro","falso"]
 erros = []
-siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","SyntaxError"]
+siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","SyntaxError", "Warning"]
 dados = []
 tuplas = []
 iterador = 0
@@ -1313,7 +1313,19 @@ def CONTEUDO():
                 output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
             mantemToken() 
             return 0       
-        return i
+        else:
+            if(tuplas[2] == "}"):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                return 0
+            else:
+                if(int(linha)<10):
+                    aux = "0"+linha
+                    output(int(aux), "Warning", "Existem declaracoes apos o retorno que nunca serao atigindas")
+                else:    
+                    output(int(linha), "Warning", "Existem declaracoes apos o retorno que nunca serao atigindas")
+                mantemToken() 
+                return CONTEUDO()           
     elif(tuplas[1] == "IDE"): 
         linha = tuplas[0]       
         if(dados[iterador][2] == '(' and linha == tuplas[0]):
@@ -1870,7 +1882,6 @@ def FUNCAO ():
     if(tuplas[2]=="vazio" and linha == tuplas[0]):
         buffer = buffer + " " + tuplas[2]
         proxToken() 
-        #print(dados)
         if(tuplas[1]=="IDE" and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
             proxToken()  

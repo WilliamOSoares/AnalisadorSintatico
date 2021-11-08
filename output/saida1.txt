@@ -1,1 +1,1 @@
-55 SyntaxError Declaracoes Fora de Escopo:  variaveis { inteiro a , b , c ; real sociedad = - 1.1 ; real valladolid = 11.1 ; cadeia a = False ; }
+24 Warning Existem declaracoes apos o retorno que nunca serao atigindas

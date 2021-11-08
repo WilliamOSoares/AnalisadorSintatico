@@ -1,14 +1,17 @@
 03 CMF "Isso é uma unidade"
-05 CMF "Isso é uma dezena"
-07 CMF "Isso é uma centena"
-09 CMF "Isso é acima de centena);
+06 CMF "Isso é uma dezena"
+09 CMF "Isso é uma centena"
+12 CMF "Isso é acima de centena);
 01 SyntaxError  inteiro a = leia ( "Coloque um inteiro:" ) ;
 02 SyntaxError  se ( a <= 9 ) {
 03 SyntaxError  escreva ( ) ;
-04 SyntaxError  } senao se ( < 100 ) {
-05 SyntaxError  escreva ( )
-06 SyntaxError  } senao se ( a <= ) {
-07 SyntaxError  escreva ( )
-08 SyntaxError  } senao {
-09 SyntaxError  escreva (
-10 SyntaxError Fim do arquivo / falta o '}'
+04 SyntaxError  }
+05 SyntaxError  senao se ( < 100 ) {
+06 SyntaxError  escreva ( )
+07 SyntaxError  }
+08 SyntaxError  senao se ( a <= ) {
+09 SyntaxError  escreva ( )
+10 SyntaxError  }
+11 SyntaxError  senao {
+12 SyntaxError  escreva (
+13 SyntaxError Fim do arquivo / falta o '}'
