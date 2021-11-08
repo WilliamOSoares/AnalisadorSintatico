@@ -2757,6 +2757,6 @@ else:
             buffer=""
         countArq+=1
         erros.clear()
-        dados=[]
+        dados.clear()
         tuplas.clear()
         iterador=0
