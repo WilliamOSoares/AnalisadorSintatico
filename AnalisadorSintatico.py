@@ -12,7 +12,7 @@ skip = False #Usado para pular linha
 endRead = False #Acaba a leitura de arquivos
 pre = ["algoritmo","variaveis","constantes","registro","funcao","retorno","vazio","se","senao","enquanto","para","leia","escreva","inteiro","real","booleano","char","cadeia","verdadeiro","falso"]
 erros = []
-siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","CmdMF"]
+siglaErro = ["SIB","SII","CMF","NMF","CaMF","CoMF","OpMF","SyntaxError"]
 dados = []
 tuplas = []
 iterador = 0
@@ -679,25 +679,10 @@ def mantemToken():
     else:
         tuplas = [dados[len(dados)-1][0], "END", "$"]
 
-def precToken():
-    global dados, iterador
-    tuplas=[]
-    flag = iterador-2                
-    while(flag!=0):
-        if(flag<=len(dados)):
-            tuplas = [dados[flag][0], dados[flag][1],dados[flag][2]]
-        else:
-            tuplas = [dados[len(dados)-1][0], "END", "$"]
-        if(tuplas[2]=="&&" or tuplas[2]=="||" or tuplas[2]=="<=" or tuplas[2]==">=" or tuplas[2]=="<" or tuplas[2]==">"):
-            flag=0
-        else:
-            flag=flag-1
-    return tuplas[2]
-
 ########################################### Analise Sintatica ###############################################
 
 def START():
-    global tuplas, buffer
+    global tuplas, buffer, linha
     if(tuplas[2] == "algoritmo"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -705,29 +690,80 @@ def START():
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        FUNCAO()
+        i = FUNCAO()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
         START()
     elif(tuplas[2] == "constantes"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        CONSTANTES()
+        i = CONSTANTES()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
+            START()
         B()
     elif(tuplas[2] == "variaveis"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        VARIAVEIS()
+        i = VARIAVEIS()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
+            START()
         A()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
-        REGISTRO()
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            i = REGISTRO()
+            if(i==1):
+                output(int(tuplas[0]), "SyntaxError", buffer)
+                mantemToken()
+                buffer = ""
         START()
-    else:
-        output(int(tuplas[0]), "CmdMF", tuplas[2])
+    else:    
+        errado = False
+        if(not(len(buffer)==0)):          
+            errado = True
+        mantemToken()            
+        while(tuplas[2]!="$"):
+            if(tuplas[2] == ";"):
+                buffer = buffer + " " + tuplas[2]
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                proxToken()
+                return START()
+            elif(linha != tuplas[0]):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                linha = tuplas[0]
+                return START()
+            else:            
+                errado = True
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+        else:    
+            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
         mantemToken()
+        return 0
 
 def A():
-    global tuplas, buffer
+    global tuplas, buffer, linha
     if(tuplas[2] == "algoritmo"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -735,23 +771,69 @@ def A():
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        FUNCAO()
+        i = FUNCAO()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
         A()
     elif(tuplas[2] == "constantes"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        CONSTANTES()
+        i = CONSTANTES()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
+            A()
         C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
-        REGISTRO()
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            i = REGISTRO()
+            if(i==1):
+                output(int(tuplas[0]), "SyntaxError", buffer)
+                mantemToken()
+                buffer = ""
         A()
-    else:
-        output(int(tuplas[0]), "CmdMF", tuplas[2])
+    else:    
+        errado = False
+        if(not(len(buffer)==0)):          
+            errado = True
+        mantemToken()            
+        while(tuplas[2]!="$"):
+            if(tuplas[2] == ";"):
+                buffer = buffer + " " + tuplas[2]
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                proxToken()
+                return A()
+            elif(linha != tuplas[0]):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                linha = tuplas[0]
+                return A()
+            else:            
+                errado = True
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+        else:    
+            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
         mantemToken()
+        return 0
 def B():
-    global tuplas, buffer
+    global tuplas, buffer, linha
     if(tuplas[2] == "algoritmo"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -759,23 +841,69 @@ def B():
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        FUNCAO()
+        i = FUNCAO()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
         B()
     elif(tuplas[2] == "variaveis"):
         buffer = buffer + " " + tuplas[2]
-        proxToken()
-        VARIAVEIS()
-        A()
+        proxToken()        
+        i = VARIAVEIS()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
+            B()
+        C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
-        REGISTRO()
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            i = REGISTRO()
+            if(i==1):
+                output(int(tuplas[0]), "SyntaxError", buffer)
+                mantemToken()
+                buffer = ""
         B()
-    else:
-        output(int(tuplas[0]), "CmdMF", tuplas[2])
+    else:    
+        errado = False
+        if(not(len(buffer)==0)):          
+            errado = True
+        mantemToken()            
+        while(tuplas[2]!="$"):
+            if(tuplas[2] == ";"):
+                buffer = buffer + " " + tuplas[2]
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                proxToken()
+                return B()
+            elif(linha != tuplas[0]):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                linha = tuplas[0]
+                return B()
+            else:            
+                errado = True
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+        else:    
+            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
         mantemToken()
+        return 0
 def C():
-    global tuplas, buffer
+    global tuplas, buffer, linha
     if(tuplas[2] == "algoritmo"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -783,208 +911,588 @@ def C():
     elif(tuplas[2] == "funcao"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
-        FUNCAO()
+        i = FUNCAO()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
         C()
     elif(tuplas[2] == "registro"):
         buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
         proxToken()
-        REGISTRO()
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            i = REGISTRO()
+            if(i==1):
+                output(int(tuplas[0]), "SyntaxError", buffer)
+                mantemToken()
+                buffer = ""
         C()
-    else:
-        output(int(tuplas[0]), "CmdMF", tuplas[2])
+    else:    
+        errado = False
+        if(not(len(buffer)==0)):          
+            errado = True
+        mantemToken()            
+        while(tuplas[2]!="$"):
+            if(tuplas[2] == ";"):
+                buffer = buffer + " " + tuplas[2]
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                proxToken()
+                return C()
+            elif(linha != tuplas[0]):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                linha = tuplas[0]
+                return C()
+            else:            
+                errado = True
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+        else:    
+            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
         mantemToken()
+        return 0
 
 def ALGORITMO():
     global tuplas, buffer
     if(tuplas[2]=="{"):
+        buffer = buffer + " " + tuplas[2]
         proxToken()
         i = CONTEUDO()
-        return i
-        
-
-def CONTEUDO():
-    global tuplas, iterador, dados, buffer, linha   ### COLOCAR O BUFFER GLOBAL PARA PERGAR DO INICIO DO ERRO ATÉ O FINAL "LEIA"
-    errado = False
-    retorno = 0
-    while(tuplas[2]!="$"):
-        if(tuplas[2] == "}"):
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-            buffer = buffer + " " + tuplas[2]
+        if(i==0):
+            buffer=""
             proxToken()
-            return 0
-        elif(tuplas[2] == "escreva"):
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = ESCREVA()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""
-        elif(tuplas[2] == "leia"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = LEIA()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""
-        elif(tuplas[2] == "constantes"):
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            proxToken()            
-            CONSTANTES()
-            buffer = ""
-            linha = tuplas[0]
-        elif(tuplas[2] == "variaveis"):
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            proxToken()            
-            VARIAVEIS()
-            buffer = ""
-            linha = tuplas[0]
-        elif(tuplas[2] == "se"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = SE()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""
-        elif(tuplas[2] == "enquanto"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = ENQUANTO()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""
-        elif(tuplas[2] == "para"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = PARA()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""        
-        elif(tuplas[2] == "registro"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            if(tuplas[1] == 'IDE' and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                i = REGISTRO()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""  
-        elif(tuplas[2] == "retorno"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-            i = RETORNO()
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = "" 
-        elif(tuplas[1] == "IDE"): 
-            if(errado):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-                buffer = ""
-                errado = False
-            linha = tuplas[0]       
-            if(dados[iterador][2] == '(' and linha == tuplas[0]):
-                i = CHAMADAFUNCAO()
-                if(i==0): 
-                    if(tuplas[2]==";" and linha == tuplas[0]):
-                        buffer = buffer + " " + tuplas[2]
-                        proxToken()  
-                    else:
-                        i=1  
-            elif(dados[iterador][2] == '=' and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()
-                if(tuplas[2] == '=' and linha == tuplas[0]):
+    foraEscopo = False
+    while(tuplas[2]!="$"):
+        if(not(foraEscopo)):
+            foraEscopo = True
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+    if(foraEscopo):
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
+        else:    
+            output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)    
+    return 0
+        
+def CONTEUDO():
+    global tuplas, iterador, dados, buffer, linha
+    if(tuplas[2] == "}"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    elif(tuplas[2] == "escreva"):
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = ESCREVA()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
                     buffer = buffer + " " + tuplas[2]
                     proxToken()
-                    i = EXPRESSAOB()
-                    if(i==0): 
-                        if(tuplas[2]==";" and linha == tuplas[0]):
-                            buffer = buffer + " " + tuplas[2]
-                            proxToken()  
-                        else:
-                            i=1
-                else:
-                    i=1
-            if(i == 1):
-                output(int(tuplas[0]), "CmdMF", buffer)
-                mantemToken()
-            buffer = ""  
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken()
+            return 0
         else:
-            errado = True
+            buffer = ""
+            return CONTEUDO()
+    elif(tuplas[2] == "leia"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = LEIA()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0
+        else:
+            buffer = ""
+            return CONTEUDO()
+    elif(tuplas[2] == "constantes"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()            
+        i = CONSTANTES()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", tuplas[2])
+            mantemToken()
+            buffer = ""
+        buffer = ""
+        linha = tuplas[0]
+        return CONTEUDO()
+    elif(tuplas[2] == "variaveis"):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()            
+        i = VARIAVEIS()
+        if(i==1):
+            output(int(tuplas[0]), "SyntaxError", tuplas[2])
+            mantemToken()
+        buffer = ""
+        linha = tuplas[0]
+        return CONTEUDO()
+    elif(tuplas[2] == "se"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = SE()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0
+        else:
+            buffer = ""
+            return CONTEUDO()
+    elif(tuplas[2] == "enquanto"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = ENQUANTO()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0
+        else:
+            buffer = ""
+            return CONTEUDO()
+    elif(tuplas[2] == "para"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = PARA()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0
+        else:
+            buffer = ""
+            return CONTEUDO()        
+    elif(tuplas[2] == "registro"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        if(tuplas[1] == 'IDE' and linha == tuplas[0]):
             buffer = buffer + " " + tuplas[2]
-            linha = tuplas[0]
-            proxToken()            
-    if(int(linha)<10):
-        aux = "0"+linha
-        output(int(aux), "CmdMF", "Fim do arquivo / falta o '}'")
+            proxToken()
+            i = REGISTRO()
+            if(i == 1):
+                output(int(tuplas[0]), "SyntaxError", buffer)
+                mantemToken()
+            buffer = "" 
+            return CONTEUDO() 
+        else:
+            output(int(tuplas[0]), "SyntaxError", buffer)
+            mantemToken()
+            buffer = ""
+            return CONTEUDO() 
+    elif(tuplas[2] == "retorno"): 
+        buffer = buffer + " " + tuplas[2]
+        linha = tuplas[0]
+        proxToken()            
+        i = RETORNO()
+        if(i == 1):    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0       
+        return i
+    elif(tuplas[1] == "IDE"): 
+        linha = tuplas[0]       
+        if(dados[iterador][2] == '(' and linha == tuplas[0]):
+            i = CHAMADAFUNCAO()
+            if(i==0): 
+                if(tuplas[2]==";" and linha == tuplas[0]):
+                    buffer = ""
+                    proxToken() 
+                    return CONTEUDO() 
+                else:
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                    return CONTEUDO() 
+            else:    
+                errado = False
+                if(not(len(buffer)==0)):          
+                    errado = True
+                mantemToken()            
+                while(tuplas[2]!="$"):
+                    if(tuplas[2]=="}"):
+                        if(errado):
+                            output(int(linha), "SyntaxError", buffer)
+                            mantemToken()
+                            buffer = ""
+                        proxToken()
+                        return 0
+                    elif(tuplas[2] == ";"):
+                        buffer = buffer + " " + tuplas[2]
+                        if(errado):
+                            output(int(linha), "SyntaxError", buffer)
+                            mantemToken()
+                            buffer = ""
+                        proxToken()
+                        return CONTEUDO()
+                    elif(linha != tuplas[0]):
+                        if(errado):
+                            output(int(linha), "SyntaxError", buffer)
+                            mantemToken()
+                            buffer = ""
+                        return CONTEUDO()
+                    else:            
+                        errado = True
+                        buffer = buffer + " " + tuplas[2]
+                        proxToken()
+                if(int(linha)<10):
+                    aux = "0"+linha
+                    output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+                else:    
+                    output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+                mantemToken()
+                return 0
+        elif(dados[iterador][2] == '=' and linha == tuplas[0]):
+            buffer = buffer + " " + tuplas[2]
+            proxToken()
+            if(tuplas[2] == '=' and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                i = EXPRESSAOB()
+                if(i==0): 
+                    if(tuplas[2]==";" and linha == tuplas[0]):
+                        buffer = ""
+                        proxToken() 
+                        return CONTEUDO() 
+                    else:
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                        return CONTEUDO() 
+                else:    
+                    errado = False
+                    if(not(len(buffer)==0)):          
+                        errado = True
+                    mantemToken()            
+                    while(tuplas[2]!="$"):
+                        if(tuplas[2]=="}"):
+                            if(errado):
+                                output(int(linha), "SyntaxError", buffer)
+                                mantemToken()
+                                buffer = ""
+                            proxToken()
+                            return 0
+                        elif(tuplas[2] == ";"):
+                            buffer = buffer + " " + tuplas[2]
+                            if(errado):
+                                output(int(linha), "SyntaxError", buffer)
+                                mantemToken()
+                                buffer = ""
+                            proxToken()
+                            return CONTEUDO()
+                        elif(linha != tuplas[0]):
+                            if(errado):
+                                output(int(linha), "SyntaxError", buffer)
+                                mantemToken()
+                                buffer = ""
+                            return CONTEUDO()
+                        else:            
+                            errado = True
+                            buffer = buffer + " " + tuplas[2]
+                            proxToken()
+                    if(int(linha)<10):
+                        aux = "0"+linha
+                        output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+                    else:    
+                        output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+                    mantemToken()
+                    return 0
+            else:
+                output(int(linha), "SyntaxError", buffer)
+                mantemToken()
+                buffer = ""
+                return CONTEUDO()
+        else:    
+            errado = False
+            if(not(len(buffer)==0)):          
+                errado = True
+            mantemToken()            
+            while(tuplas[2]!="$"):
+                if(tuplas[2]=="}"):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return 0
+                elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    proxToken()
+                    return CONTEUDO()
+                elif(linha != tuplas[0]):
+                    if(errado):
+                        output(int(linha), "SyntaxError", buffer)
+                        mantemToken()
+                        buffer = ""
+                    return CONTEUDO()
+                else:            
+                    errado = True
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken()
+            return 0  
     else:    
-        output(int(linha), "CmdMF", "Fim do arquivo / falta o '}'")
-    mantemToken()
-    return retorno
-
+        errado = False
+        if(not(len(buffer)==0)):          
+            errado = True
+        mantemToken()            
+        while(tuplas[2]!="$"):
+            if(tuplas[2]=="}"):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                proxToken()
+                return 0
+            elif(tuplas[2] == ";"):
+                buffer = buffer + " " + tuplas[2]
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                return CONTEUDO()
+            elif(linha != tuplas[0]):
+                if(errado):
+                    output(int(linha), "SyntaxError", buffer)
+                    mantemToken()
+                    buffer = ""
+                iterador = iterador-1
+                return CONTEUDO()
+            else:            
+                errado = True
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+        if(int(linha)<10):
+            aux = "0"+linha
+            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+        else:    
+            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+        mantemToken()
+        return 0
 ########################################### Escreva ######################################################
 
 def ESCREVA():
@@ -1228,21 +1736,22 @@ def REGISTRO():
             while(tuplas[2]!="$"):
                 if(tuplas[2]=="}"):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     proxToken()
                     return 0
                 elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     tuplas[2] = "{"
                     return VARIAVEIS()
                 elif(linha != tuplas[0]):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     iterador = iterador-1
@@ -1253,6 +1762,13 @@ def REGISTRO():
                     errado = True
                     buffer = buffer + " " + tuplas[2]
                     proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken() 
+            return 0
         return i
     return 1
 
@@ -1371,9 +1887,9 @@ def FUNCAOINIT():
         i = PARANINIT()
         if(i==0): 
             if(tuplas[2] == '{'):
-                    buffer = ""
-                    proxToken()
-                    return CONTEUDO()
+                buffer = ""
+                proxToken()
+                return CONTEUDO()
             else:
                 return 1               
         return i
@@ -1508,21 +2024,22 @@ def CONSTANTES():
             while(tuplas[2]!="$"):
                 if(tuplas[2]=="}"):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     proxToken()
                     return 0
                 elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     tuplas[2] = "{"
                     return CONSTANTES()
                 elif(linha != tuplas[0]):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     iterador = iterador-1
@@ -1533,6 +2050,12 @@ def CONSTANTES():
                     errado = True
                     buffer = buffer + " " + tuplas[2]
                     proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken()
         return i
     return 1
 
@@ -1595,21 +2118,22 @@ def VARIAVEIS():
             while(tuplas[2]!="$"):
                 if(tuplas[2]=="}"):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     proxToken()
                     return 0
                 elif(tuplas[2] == ";"):
+                    buffer = buffer + " " + tuplas[2]
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     tuplas[2] = "{"
                     return VARIAVEIS()
                 elif(linha != tuplas[0]):
                     if(errado):
-                        output(int(linha), "CmdMF", buffer)
+                        output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
                     iterador = iterador-1
@@ -1620,6 +2144,12 @@ def VARIAVEIS():
                     errado = True
                     buffer = buffer + " " + tuplas[2]
                     proxToken()
+            if(int(linha)<10):
+                aux = "0"+linha
+                output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            else:    
+                output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            mantemToken()
         return i
     return 1
 
@@ -2209,10 +2739,12 @@ else:
         buffer=""
         if(flagSintax):
             proxToken()
+            linha = tuplas[0]
             START()
             flagSintax = False
             output(0,"ERRO","")
             erros.clear()
+            buffer=""
         countArq+=1
         erros.clear()
         dados.clear()

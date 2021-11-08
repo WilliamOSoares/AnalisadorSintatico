@@ -1,5 +1,1 @@
-12 CmdMF  algoritmo {
-13 CmdMF  escreva ( a )
-14 CmdMF  leia ( a . a [ 2 ] )
-15 CmdMF  constantes {
-20 CmdMF variaveis
+SUCESSO!

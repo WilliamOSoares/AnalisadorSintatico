@@ -8,6 +8,7 @@ variaveis{
     real sociedad = - 1.1;
     real valladolid = 11.1;
     cadeia a = False;
+}
 
 algoritmo{
     escreva(a);

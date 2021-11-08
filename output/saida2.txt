@@ -1,1 +1,14 @@
-01 CmdMF  booleano a = a ( a , a > 4 , a && e , true , 2 + 2 ) ; }Variaveis
+01 SyntaxError  Variaveis {
+02 SyntaxError  inteiro a_2 ;
+03 SyntaxError  inteiro a_2 ;
+04 SyntaxError  real c ;
+05 SyntaxError  }
+08 SyntaxError  funcao vazio soma ( inteiro e ,
+08 SyntaxError  ) {
+09 SyntaxError  c = e + f ;
+10 SyntaxError  escreva ( c ) ;
+11 SyntaxError  }
+19 SyntaxError  b = 2
+20 SyntaxError  soma ( a , )
+22 SyntaxError  se ( c > ) {
+23 SyntaxError Declaracoes Fora de Escopo:  nao { escreva ( "Esse numero e menor" ) ; } }
