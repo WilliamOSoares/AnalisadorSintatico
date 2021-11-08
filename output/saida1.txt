@@ -1,1 +1,2 @@
-24 Warning Existem declaracoes apos o retorno que nunca serao atigindas
+25 SyntaxError Declaracoes Fora de Escopo:  leia ( c ) ;
+26 SyntaxError Declaracoes Fora de Escopo:  }

@@ -1,8 +1,8 @@
-01 SyntaxError  Variaveis {
-02 SyntaxError  inteiro a_2 ;
-03 SyntaxError  inteiro a_2 ;
-04 SyntaxError  real c ;
-05 SyntaxError  }
+01 SyntaxError Declaracoes Fora de Escopo:  Variaveis {
+02 SyntaxError Declaracoes Fora de Escopo:  inteiro a_2 ;
+03 SyntaxError Declaracoes Fora de Escopo:  inteiro a_2 ;
+04 SyntaxError Declaracoes Fora de Escopo:  real c ;
+05 SyntaxError Declaracoes Fora de Escopo:  }
 19 SyntaxError  b = 2
 20 SyntaxError  soma ( a , )
 22 SyntaxError  se ( c > ) {

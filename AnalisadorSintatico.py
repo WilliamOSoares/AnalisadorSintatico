@@ -737,18 +737,18 @@ def START():
         if(not(len(buffer)==0)):          
             errado = True
         mantemToken()            
-        while(tuplas[2]!="$"):
+        while(tuplas[2]!="$"):             
             if(tuplas[2] == ";"):
                 buffer = buffer + " " + tuplas[2]
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 proxToken()
                 return START()
             elif(linha != tuplas[0]):
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 linha = tuplas[0]
@@ -756,12 +756,12 @@ def START():
             else:            
                 errado = True
                 buffer = buffer + " " + tuplas[2]
-                proxToken()
+                proxToken()  
         if(int(linha)<10):
             aux = "0"+linha
-            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(aux), "SyntaxError", "Fim do arquivo")
         else:    
-            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(linha), "SyntaxError", "Fim do arquivo")
         mantemToken()
         return 0
 
@@ -814,14 +814,14 @@ def A():
             if(tuplas[2] == ";"):
                 buffer = buffer + " " + tuplas[2]
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 proxToken()
                 return A()
             elif(linha != tuplas[0]):
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 linha = tuplas[0]
@@ -832,9 +832,9 @@ def A():
                 proxToken()
         if(int(linha)<10):
             aux = "0"+linha
-            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(aux), "SyntaxError", "Fim do arquivo")
         else:    
-            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(linha), "SyntaxError", "Fim do arquivo")
         mantemToken()
         return 0
 def B():
@@ -886,14 +886,14 @@ def B():
             if(tuplas[2] == ";"):
                 buffer = buffer + " " + tuplas[2]
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 proxToken()
                 return B()
             elif(linha != tuplas[0]):
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 linha = tuplas[0]
@@ -904,9 +904,9 @@ def B():
                 proxToken()
         if(int(linha)<10):
             aux = "0"+linha
-            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(aux), "SyntaxError", "Fim do arquivo")
         else:    
-            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(linha), "SyntaxError", "Fim do arquivo")
         mantemToken()
         return 0
 def C():
@@ -947,14 +947,14 @@ def C():
             if(tuplas[2] == ";"):
                 buffer = buffer + " " + tuplas[2]
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 proxToken()
                 return C()
             elif(linha != tuplas[0]):
                 if(errado):
-                    output(int(linha), "SyntaxError", buffer)
+                    output(int(linha), "SyntaxError", "Declaracoes Fora de Escopo: " + buffer)
                     mantemToken()
                     buffer = ""
                 linha = tuplas[0]
@@ -965,9 +965,9 @@ def C():
                 proxToken()
         if(int(linha)<10):
             aux = "0"+linha
-            output(int(aux), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(aux), "SyntaxError", "Fim do arquivo")
         else:    
-            output(int(linha), "SyntaxError", "Fim do arquivo / falta o '}'")
+            output(int(linha), "SyntaxError", "Fim do arquivo")
         mantemToken()
         return 0
 
@@ -1314,18 +1314,17 @@ def CONTEUDO():
             mantemToken() 
             return 0       
         else:
+            buffer = ""
             if(tuplas[2] == "}"):
                 buffer = buffer + " " + tuplas[2]
                 proxToken()
                 return 0
             else:
-                if(int(linha)<10):
-                    aux = "0"+linha
-                    output(int(aux), "Warning", "Existem declaracoes apos o retorno que nunca serao atigindas")
-                else:    
-                    output(int(linha), "Warning", "Existem declaracoes apos o retorno que nunca serao atigindas")
-                mantemToken() 
-                return CONTEUDO()           
+                #buffer = buffer + " " + tuplas[2]
+                #output(int(linha), "SyntaxError", buffer)
+                #mantemToken()
+                #buffer = ""
+                return 0           
     elif(tuplas[1] == "IDE"): 
         linha = tuplas[0]       
         if(dados[iterador][2] == '(' and linha == tuplas[0]):
@@ -1384,7 +1383,7 @@ def CONTEUDO():
             if(tuplas[2] == '=' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
                 proxToken()
-                i = EXPRESSAOB()
+                i = EXPATRIBUICAOB()
                 if(i==0): 
                     if(tuplas[2]==";" and linha == tuplas[0]):
                         buffer = ""
@@ -1725,21 +1724,35 @@ def PARACONT():
 
 def PARAFIM():
     global tuplas, buffer, linha
-    i = EXPATRIBUICAO()
-    if(i == 0):
-        if(tuplas[2] == ')' and linha == tuplas[0]):
-            buffer = buffer + " " + tuplas[2]
-            proxToken()
-            if(tuplas[2] == '{'):
+    if(tuplas[1] == 'IDE' and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = ACESSOVAR()        
+        if(i==0):
+            if(tuplas[2] == '=' and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
                 proxToken()
-                return CONTEUDO()
+                i = EXPRESSAOB()   
             else:
-                return 1    
+                i = EXPATRIBUICAOCONTB() 
+            if(i == 0):
+                if(tuplas[2] == ')' and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()
+                    if(tuplas[2] == '{'):
+                        buffer = buffer + " " + tuplas[2]
+                        proxToken()
+                        return CONTEUDO()
+                    else:
+                        return 1    
+                else:
+                    return 1
+            else:
+                return i
         else:
-            return 1
+            return i
     else:
-        return i
+        return 1
 
 ############################################## Registro ######################################
 
@@ -2706,6 +2719,28 @@ def EXPATRIBUICAO():
     else:
         return 1
 
+def EXPATRIBUICAOB():
+    global tuplas, buffer, linha
+    if(tuplas[1]=="IDE" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        i = ACESSOVAR()
+        if(i==0):
+            if(tuplas[2]=="-" or tuplas[2]=="+" or tuplas[2]=="*" or tuplas[2]=="/" and linha == tuplas[0]):
+                i = EXPARITMETICACONT()
+                if(i==0):
+                    return EXPRESSAOCONTB()
+                return i
+            elif(tuplas[2]=="(" and linha == tuplas[0]):
+                buffer = buffer + " " + tuplas[2]
+                proxToken()
+                return PARAN() 
+            else:
+                return EXPRESSAOCONTB()
+        return i
+    else:
+        return EXPRESSAOB()
+
 def EXPATRIBUICAOCONT():    
     global tuplas, buffer, linha
     if(tuplas[2]=="++" and linha == tuplas[0]):
@@ -2718,6 +2753,19 @@ def EXPATRIBUICAOCONT():
         return 0
     else:
         return 0
+
+def EXPATRIBUICAOCONTB():    
+    global tuplas, buffer, linha
+    if(tuplas[2]=="++" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    elif(tuplas[2]=="--" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    else:
+        return 1
 
 ################################################# MAIN ####################################################
 # Verifica se a existe a pasta input

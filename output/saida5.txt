@@ -1,0 +1,1 @@
+41 SyntaxError  x = inicializafunc ( vazio ) ;
