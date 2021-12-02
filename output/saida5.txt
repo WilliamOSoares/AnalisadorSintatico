@@ -1,1 +1,4 @@
-SUCESSO!
+22 SemanticoError Variavel ja instanciada:nome
+25 SemanticoError Variavel ja instanciada:pontos
+26 SemanticoError Variavel ja instanciada:pontos
+27 SemanticoError Variavel ja instanciada:pontos

@@ -1,50 +1,50 @@
 constantes{
     inteiro a[2][2][2] = {2,2},{2},{3,2,1};
-    real madrid = "falso";
-    booleano a = a(a,a>4,a&&e,true,2+2);
+    real madrid = "falso";                          
+    booleano t = a(a,a>4,a&&e,true,2+2);           
 }
 variaveis{
-    inteiro a,b,c;
+    inteiro a,b,c;                                  
     real sociedad = - 1.1;
     real valladolid = 11.1;
-    cadeia a = False;
+    cadeia a = False;                              
 }
 
 funcao vazio soma (inteiro e){
-	c = e + f;
+	c = e + f;                                     
 	escreva(c);
 }
 
 funcao inteiro soma (inteiro e){
-	c = e + f;
+	c = e + f;                                      
 	escreva(c);
-    se(a>b){
+    se(a>b){                                       
         retorno a;
     }
     retorno c;
-    leia(c);
+    leia(c);                                        
 }
 
 algoritmo{
     escreva(a);
-    leia(a.a[2]);
+    leia(a.a[2]);                                  
     constantes{
-        inteiro a[2][2][2] = {2,2},{2},{3,2,1};
-        real madrid = "falso";
-        booleano a = a(a,a>4,a&&e,true,2+2);
+        inteiro g[2][2][2] = {2,2},{2},{3,2,1};
+        cadeia k = "falso";
+        booleano h = soma(c);    
     }
     variaveis{
-        inteiro a,b,c;
-        real sociedad = - 1.1;
-        real valladolid = 11.1;
-        cadeia a = False;
+        inteiro u,by,c_;
+        inteiro cj = 1;
+        real NArockstar = 11.1;
+        cadeia p = "teste";
     }
     
     % OPA eae véi blz?
     {# jajajaja #}
-    a = 's';
-    a(a,v,g);
-    se(a==a){
+    a = 's';                                        
+    a(a,v,g);                                       
+    se(a==a){                                      
         escreva(a);
     }
     se(b==b){
@@ -52,13 +52,13 @@ algoritmo{
     } senao {
         escreva(a);
     }
-    enquanto(2>(2>(2>2))){
+    enquanto(2>(2>(2>2))){                          
         escreva(c);
     }
-    para(i=2+2; a==b; i++){
+    para(i=2+2; a==b; i++){                         
         escreva(d);
     }
-    registro a {
+    registro a {                                   
         inteiro a;
         real mallorca = 1.1;
     }

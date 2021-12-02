@@ -1,3 +1,9 @@
+08 SemanticoError Variavel ja instanciada:a
+09 SemanticoError Variavel ja instanciada:madrid
+10 SemanticoError Variavel ja instanciada:b
 16 SyntaxError  c = a . a [ 3 + 3 ] [ c ] [ 2 ] ;
 17 SyntaxError  g = a . madrid
 17 SyntaxError  = a . a ;
+19 SemanticoError Variavel ja instanciada:a
+20 SemanticoError Variavel ja instanciada:madrid
+21 SemanticoError Variavel ja instanciada:b

@@ -972,7 +972,7 @@ def C():
         return 0
 
 def ALGORITMO():
-    global tuplas, buffer
+    global tuplas, buffer, linha
     if(tuplas[2]=="{"):
         buffer = buffer + " " + tuplas[2]
         proxToken()
@@ -1032,6 +1032,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1078,6 +1079,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1145,6 +1147,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1191,6 +1194,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1237,6 +1241,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1301,6 +1306,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1365,6 +1371,7 @@ def CONTEUDO():
                             output(int(linha), "SyntaxError", buffer)
                             mantemToken()
                             buffer = ""
+                        linha = tuplas[0]
                         return CONTEUDO()
                     else:            
                         errado = True
@@ -1420,6 +1427,7 @@ def CONTEUDO():
                                 output(int(linha), "SyntaxError", buffer)
                                 mantemToken()
                                 buffer = ""
+                            linha = tuplas[0]
                             return CONTEUDO()
                         else:            
                             errado = True
@@ -1463,6 +1471,7 @@ def CONTEUDO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
+                    linha = tuplas[0]
                     return CONTEUDO()
                 else:            
                     errado = True
@@ -1501,7 +1510,8 @@ def CONTEUDO():
                     output(int(linha), "SyntaxError", buffer)
                     mantemToken()
                     buffer = ""
-                iterador = iterador-1
+                #iterador = iterador-1
+                linha = tuplas[0]
                 return CONTEUDO()
             else:            
                 errado = True
@@ -1789,7 +1799,8 @@ def REGISTRO():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
-                    iterador = iterador-1
+                    #iterador = iterador-1
+                    linha = tuplas[0]
                     tuplas[1] = "DEL"
                     tuplas[2] = "{"                    
                     return VARIAVEIS()
@@ -1974,24 +1985,29 @@ def VETORMAISUM():
 
 def PARANINIT():
     global tuplas, buffer, linha, dados
-    i = TIPOA()
-    if(i==0): 
-        if(tuplas[1]=="IDE" and linha == tuplas[0]):
-            buffer = buffer + " " + tuplas[2]
-            proxToken()  
-            if(tuplas[2]=="," and linha == tuplas[0]):
+    if(tuplas[2]==")" and linha == tuplas[0]):
+        buffer = buffer + " " + tuplas[2]
+        proxToken()
+        return 0
+    else:
+        i = TIPOA()
+        if(i==0): 
+            if(tuplas[1]=="IDE" and linha == tuplas[0]):
                 buffer = buffer + " " + tuplas[2]
                 proxToken()  
-                return PARANINIT()
-            elif(tuplas[2]==")" and linha == tuplas[0]):
-                buffer = buffer + " " + tuplas[2]
-                proxToken()  
-                return 0
+                if(tuplas[2]=="," and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()  
+                    return PARANINIT()
+                elif(tuplas[2]==")" and linha == tuplas[0]):
+                    buffer = buffer + " " + tuplas[2]
+                    proxToken()  
+                    return 0
+                else:
+                    return 1
             else:
                 return 1
-        else:
-            return 1
-    return i
+        return i
 
 def CHAMADAFUNCAO():
     global tuplas, buffer, linha  
@@ -2077,7 +2093,8 @@ def CONSTANTES():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
-                    iterador = iterador-1
+                    #iterador = iterador-1
+                    linha = tuplas[0]
                     tuplas[1] = "DEL"
                     tuplas[2] = "{"
                     return CONSTANTES()
@@ -2171,7 +2188,8 @@ def VARIAVEIS():
                         output(int(linha), "SyntaxError", buffer)
                         mantemToken()
                         buffer = ""
-                    iterador = iterador-1
+                    #iterador = iterador-1
+                    linha = tuplas[0]
                     tuplas[1] = "DEL"
                     tuplas[2] = "{"                    
                     return VARIAVEIS()

@@ -1,2 +1,3 @@
 25 SyntaxError Declaracoes Fora de Escopo:  leia ( c ) ;
 26 SyntaxError Declaracoes Fora de Escopo:  }
+62 SemanticoError Variavel ja instanciada:a
